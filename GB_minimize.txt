@@ -1,0 +1,33 @@
+# ---------- Define Settings --------------------- 
+compute csym all centro/atom ${lattype}
+compute eng all pe/atom 
+compute eatoms all reduce sum c_eng 
+
+# ---------- Run Minimization --------------------- 
+reset_timestep 0 
+thermo 10 
+thermo_style custom step pe lx ly lz press pxx pyy pzz c_eatoms
+min_style cg 
+minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
+
+# ---------- Run Minimization 2--------------------- 
+# Now allow the box to expand/contract perpendicular to the grain boundary
+reset_timestep 0 
+thermo 10 
+thermo_style custom step pe lx ly lz press pxx pyy pzz c_eatoms 
+fix 1 all box/relax y 0.0 vmax 0.01
+min_style cg 
+minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
+ 
+# ---------- Calculate GB Energy --------------------- 
+variable esum equal "v_minimumenergy * count(all)" 
+variable xseng equal "c_eatoms - (v_minimumenergy * count(all))" 
+variable gbarea equal "lx * lz * 2" 
+variable gbe equal "(c_eatoms - (v_minimumenergy * count(all)))/v_gbarea" 
+variable gbemJm2 equal ${gbe}*16021.7733 
+variable gbernd equal round(${gbemJm2}) 
+print "After third minimization:" 
+print "GB energy is ${gbemJm2} mJ/m^2" 
+ 
+# Store number of atoms for overlap criterion, i.e., do not rerun equivalent configurations 
+variable atomprev equal ${natoms}

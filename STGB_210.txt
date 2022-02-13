@@ -1,0 +1,24 @@
+# Orientations in Crystal 1
+# x/y/z are directions, first number is grain number, second numbers are vector components
+# y is perpendicular to boundary
+variable x11 equal 0
+variable x12 equal 2
+variable x13 equal 1
+variable y11 equal 0
+variable y12 equal -1
+variable y13 equal 2
+variable z11 equal 1
+variable z12 equal 0
+variable z13 equal 0
+
+# Orientations in Crystal 2
+variable x21 equal 0
+variable x22 equal 2
+variable x23 equal -1
+variable y21 equal 0
+variable y22 equal 1
+variable y23 equal 2
+variable z21 equal 1
+variable z22 equal 0
+variable z23 equal 0
+

@@ -1,0 +1,90 @@
+# INITIALIZATION
+clear
+
+units metal
+atom_style atomic
+boundary p p f
+
+variable name index STGB_210
+variable conc index 1
+variable dt equal 0.001 #ps
+variable md_steps equal 100
+variable mc_steps equal 10
+variable mu equal 1
+variable T index 500
+variable kappa index 10
+variable yGBw index 10
+timestep ${dt}
+
+# ATOMS DEFINITION
+read_data ${name}_surface_thermal_relaxed_T_${T}.dat
+group 1 type 1
+group 2 type 2
+compute y1 1 reduce ave y
+compute y2 2 reduce ave y
+variable yGB1 equal "(count(1)*c_y1+count(2)*c_y2)/count(all)"
+variable yGB2 equal "(count(1)*(c_y1+ly)+count(2)*c_y2)/count(all)"
+variable file_tmp1 index yGB1.txt
+variable file_tmp2 index yGB2.txt
+fix tmp1 all print 1 "variable yGB1 equal $(v_yGB1)" file ${file_tmp1} screen yes
+fix tmp2 all print 1 "variable yGB2 equal $(v_yGB2)" file ${file_tmp2} screen yes
+run 0
+variable yGB1 delete
+variable yGB2 delete
+include ${file_tmp1}
+include ${file_tmp2}
+unfix tmp1
+unfix tmp2
+
+set type 2 type 1
+region mobile block EDGE EDGE EDGE EDGE 6.7 EDGE
+group mobile region mobile
+region GB1 block EDGE EDGE $(v_yGB1-v_yGBw/2) $(v_yGB1+v_yGBw/2) EDGE EDGE
+region GB2 block EDGE EDGE $(v_yGB2-v_yGBw/2) EDGE EDGE EDGE
+region GB3 block EDGE EDGE EDGE $(v_yGB2-ly+v_yGBw/2) EDGE EDGE
+region GBs union 3 GB1 GB2 GB3
+group GBs region GBs
+######################################
+# DEFINE INTERATOMIC POTENTIAL
+
+include GB_potential_AgNi.txt
+
+######################################
+# FIXES
+compute peratom all pe/atom
+
+fix NVT mobile nvt temp ${T} ${T} $(100*dt) 
+
+variable conc_avg equal f_sgcmc[4]*100
+thermo_style custom step time temp pe v_conc_avg v_mu
+thermo 100
+variable file index segregation_${name}_Ni_${conc}_k_${kappa}.txt
+print "##dt = ${dt}" file ${file} screen no
+print "#time; temp; pe; conc" append ${file} screen no
+fix out all print 100 "$(time); $(temp); $(pe); $(f_sgcmc[3])" append ${file} screen no
+variable stting_tmp string "dump_segregation_${name}_Ni_${conc}_k_${kappa}"
+shell mkdir ${stting_tmp}
+dump 1 all cfg 500 ${stting_tmp}/dump.*.cfg mass type xs ys zs c_peratom
+dump_modify 1 element Ag Ni
+######################################
+# START
+fix sgcmc all sgcmc ${md_steps} 1 ${T} ${mu} variance ${kappa} $(v_conc/100)
+print """
+
+
+VCSGCMC
+
+
+"""
+label main_loop
+run $(v_md_steps*v_mc_steps)
+print "mu = ${mu}"
+variable mut equal ${mu}
+variable mu delete
+variable mu equal $(v_mut+(f_sgcmc[4]-v_conc/100)*10)
+variable mut delete
+print "mu = ${mu}"
+unfix sgcmc
+fix sgcmc all sgcmc ${md_steps} 1 ${T} ${mu} variance ${kappa} $(v_conc/100)
+write_data ${name}_Ni_${conc}_k_${kappa}.dat
+jump SELF main_loop
