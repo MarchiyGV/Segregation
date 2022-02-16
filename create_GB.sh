@@ -1,45 +1,31 @@
 #!/bin/bash
-ARGS=$(getopt -a --options vn --long "verbose, name" -- "$@")
-eval set -- "$ARGS"
-verbose="false"
-name="false"
-while true; do
-  case "$1" in
-    -v|--verbose)
-      verbose="true"
-      shift;;
-    -n|--name)
-      name="true"
-      shift;;
-    --)
-      break;;
-     *)
-      printf "Unknown option %s\n" "$1"
-      exit 1;;
-  esac
+verbose=false
+while getopts v:n: flag
+do
+    case "${flag}" in
+        v) verbose=true;;
+        n) name=${OPTARG};;
+    esac
 done
 
-if [$name = "true"]
-then
-    echo "Write GB name:"
-    read name
-else
-    name="STGB_210"
-    echo "default name was used: $name"
-fi
+echo "$name"
 
 echo; echo "Starting LAMMPS procedure..."; echo;
 
+cd scripts
 if [ $verbose = "true" ]; then
-    lmp_omp_edited -in in.GB_create_master -var gbname $name -var oriname $name".txt"
+    lmp_omp_edited -in in.GB_create_master -var gbname $name 
 else
-    log=$(lmp_omp_edited -in in.GB_create_master -var gbname $name -var oriname $name".txt")
+    echo "non verb"
+    $(lmp_omp_edited -in in.GB_create_master -var gbname $name)
 fi
-echo $log > log.txt 
+cd ..
+
+
 echo; echo "All done"; echo
-n=$(ls ./$name/ | wc -l)
+n=$(ls ./GB_projects/$name/0K_stuctures/ | wc -l)
 echo "Created $n confiurations"
-res=$(ls ./$name/ | sort -t'_' -n -k3 | head -1)
+res=$(ls ./GB_projects/$name/0K_stuctures/ | sort -t'_' -n -k3 | head -1)
 echo "minmum energy: $res"
 echo "Cell size for minimum energy configuration:"
-grep -e '[x,y,z]lo' ./$name/$res
+grep -e '[x,y,z]lo' ./GB_projects/$name/0K_stuctures/$res

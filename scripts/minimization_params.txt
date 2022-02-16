@@ -1,0 +1,6 @@
+# ---------- Setup Variables --------------------- 
+variable etol equal 1.0e-25 
+variable ftol equal 1.0e-25 
+variable maxiter equal 5000 
+variable maxeval equal 10000 
+variable counter equal 0 
