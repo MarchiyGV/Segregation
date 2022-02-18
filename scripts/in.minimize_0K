@@ -4,40 +4,65 @@ clear
 units metal
 atom_style atomic
 boundary p p s
-variable name index STGB_210
-variable structure index STGB_210_Ni_1_k_100.dat
+variable gbname index STGB_210 #should be selected by user
+variable structure_name index STGB_210_Ni_1_k_100.dat #should be selected by user
 
-variable etol equal 1.0e-25 
-variable ftol equal 1.0e-25 
-variable maxiter equal 5000 
-variable maxeval equal 10000 
+variable self index minimize_0K
 
+variable path index GB_projects
+variable pot_path index potentials
+variable home index scripts
+variable thermo_output index thermo_output
+variable dump index dump
+variable structure index ${path}/${gbname}/${structure_name}
+variable gbpath index ${path}/${gbname}
+
+shell mkdir ../${gbpath}/logs
+log ../${gbpath}/logs/${self}.log
+shell rm log.lammps
+
+variable thermo_step_M equal 100
+variable dump_step_M equal 500
+include minimization_params.txt
+include ../${gbpath}/input.txt
+variable potname index ${potname_alloy}
+variable dump_path index ${gbpath}/${dump}/${self}
+shell mkdir ../${gbpath}/${dump}
+shell mkdir ../${dump_path}
 # ATOMS DEFINITION
-read_data ${structure}
+read_data ../${structure}
 
-include GB_potential_AgNi.txt
+######################################
+# DEFINE INTERATOMIC POTENTIAL
+
+shell cd ../${pot_path}
+include ${potname}
+shell cd ../${home}
 
 ######################################
 # DEFINE THERMO AND OUTPUT
 
-shell mkdir "dump_minimize_0K"
-dump 1 all cfg 100 dump_minimize_0K/dump.${name}_*.cfg mass type xs ys zs
+dump 1 all cfg ${dump_step_M} ../${dump_path}/dump_*.cfg mass type xs ys zs
 dump_modify 1 element Ag Ni
 
 
 # ---------- Run Minimization --------------------- 
-reset_timestep 0 
-thermo 10 
+#reset_timestep 0 
+thermo ${thermo_step_M}
 thermo_style custom step pe lx ly lz press pxx pyy pzz 
 min_style cg 
 minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
 
 # ---------- Run Minimization 2--------------------- 
 # Now allow the box to expand/contract perpendicular to the grain boundary
-thermo 10 
+thermo ${thermo_step_M}
 thermo_style custom step pe lx ly lz press pxx pyy pzz 
 fix 1 all box/relax x 0.0 y 0.0 couple xy vmax 0.01
 min_style cg 
 minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
 
-write_data minimized_${structure}
+shell cd ../${gbpath}
+write_data ${self}_${structure_name}
+shell cd ../../${home}
+
+print "All done"

@@ -3,15 +3,15 @@ verbose=false
 mean_width=50
 conc=-1
 kappa=-1
-while getopts v:n:s:mw:conc:kappa: flag
+while getopts v:n:s:mw:c:k: flag
 do
     case "${flag}" in
         v) verbose=true;;
         n) name=${OPTARG};;
         s) structure=${OPTARG};;
-        mw) mean_width=${OPTARG};;
-        conc) conc=${OPTARG};;
-        kappa) kappa=${OPTARG};;
+        m) mean_width=${OPTARG};;
+        c) conc=${OPTARG};;
+        k) kappa=${OPTARG};;
         *) echo "Unknonwn option ${flag}"; exit 1;;
     esac
 done

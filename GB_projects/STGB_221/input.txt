@@ -57,4 +57,8 @@ variable mu equal 1
 variable conc equal 1
 variable kappa equal 10
 
+### --- in.minimize_0K --- ###
+variable thermo_step_M equal 100
+variable dump_step_M equal 500
+
 
