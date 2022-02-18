@@ -5,38 +5,67 @@ units metal
 atom_style atomic
 boundary p p p
 
-variable dt equal 0.001 #ps
-variable name index STGB_210
-variable structure index STGB_210/STGB_210.GBE_659_80_125.dat
-variable T index 500
+variable gbname index STGB_210 #should be selected by user
+variable structure_name index GB_E659_N80_count125.dat #should be selected by user
 
-shell mkdir "dump_thermal_relax"
+variable self index thermal_relax
+variable path index GB_projects
+variable pot_path index potentials
+variable home index scripts
+variable 0K_structures index 0K_structures
+variable thermo_output index thermo_output
+variable dump index dump
+variable structure index ${path}/${gbname}/${0K_structures}/${structure_name}
+variable gbpath index ${path}/${gbname}
+
+shell mkdir ../${gbpath}/logs
+log ../${gbpath}/logs/${self}.log
+
+variable thermo_step_TR equal 500
+variable dump_step_TR equal 500
+variable rnd_seed_TR index 12345
+include ../${gbpath}/input.txt #T, dt, potnames, nx, ny, nz, thermal_relax_steps, [thermo_step_TR, dump_step_TR, rnd_seed_TR]
+
+
+variable potname index ${potname_pure}
+
+variable dump_path index ${gbpath}/${dump}/${self}
+shell mkdir ../${gbpath}/${dump}
+shell mkdir ../${dump_path}
 
 timestep ${dt}
 
 # ATOMS DEFINITION
-read_data ${structure}
-replicate 1 1 5
+read_data ../${structure}
+replicate ${nx} ${ny} ${nz}
 
 ######################################
 # DEFINE INTERATOMIC POTENTIAL
 
-include GB_potential_Ag.txt
+shell cd ../${pot_path}
+include ${potname}
+shell cd ../${home}
 
 ######################################
 # DEFINE THERMO AND OUTPUT
 
 thermo_style custom time temp press pe
-thermo 500
-variable file index thermo.txt
+thermo ${thermo_step_TR}
+shell mkdir ../${gbpath}/${thermo_output}
+variable file index ../${gbpath}/${thermo_output}/${self}.txt
 print "##dt = ${dt}" file ${file} screen no
-print "#time; temp; pe" append ${file} screen no
-fix out all print 200 "$(time); $(temp); $(press); $(pe)" append ${file} screen no
-dump 1 all cfg 500 dump_thermal_relax/dump.${name}_*.cfg mass type xs ys zs
+print "#time; temp; press; pe" append ${file} screen no
+fix out all print ${thermo_step_TR} "$(time); $(temp); $(press); $(pe)" append ${file} screen no
+dump 1 all cfg ${dump_step_TR} ../${dump_path}/dump_*.cfg mass type xs ys zs
 dump_modify 1 element Ag Ag
 ######################################
 # START
-velocity all create $(v_T*2) 12345 mom yes rot no
+velocity all create $(v_T*2) ${rnd_seed_TR} mom no rot no
 fix NPT all npt temp ${T} ${T} $(100*dt) iso 0 0 $(1000.0*dt)
-run 100000
-write_data ${name}_relaxed_${T}.dat
+run ${thermal_relax_steps}
+
+shell cd ../${gbpath}
+write_data thermal_relaxed_T${T}_steps${thermal_relax_steps}.dat
+shell cd ../../${home} 
+
+print "All done"

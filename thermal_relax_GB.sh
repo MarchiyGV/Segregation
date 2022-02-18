@@ -1,42 +1,39 @@
 #!/bin/bash
-ARGS=$(getopt -a --options vs --long "verbose, structure" -- "$@")
-eval set -- "$ARGS"
-verbose="false"
-structure="false"
-while true; do
-  case "$1" in
-    -v|--verbose)
-      verbose="true"
-      shift;;
-    -s|--structure)
-      structure="true"
-      shift;;
-    --)
-      break;;
-     *)
-      printf "Unknown option %s\n" "$1"
-      exit 1;;
-  esac
+verbose=false
+mean_width=50
+while getopts v:n:s:m: flag
+do
+    case "${flag}" in
+        v) verbose=true;;
+        n) name=${OPTARG};;
+        s) structure=${OPTARG};;
+        m) mean_width=${OPTARG};;
+        *) echo "Unknonwn option ${flag}"; exit 1;;
+    esac
 done
-
-if [$structure = "true"]
-then
-    echo "Write structure file path:"
-    read structure
+if [[ -n "$CONDA_PREFIX" ]]; then
+    echo "Conda is active: $CONDA_PREFIX"
 else
-    structure="STGB_210/STGB_210.GBE_659_80_125.dat"
-    echo "default path was used: $structure"
+    read -p "Conda is not active, do you want to continue? " -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        echo "Ok"
+    else
+        exit 1
+    fi
 fi
 
 echo; echo "Starting LAMMPS procedure..."; echo;
-
-if [ $verbose = "true" ]; then
-    lmp_omp_edited -in in.thermal_relax -var structure $structure
+cd scripts
+if [ $verbose = true ]; then
+    lmp_omp_edited -in in.thermal_relax -var gbname $name -var structure_name $structure
 else
-    log=$(lmp_omp_edited -in in.thermal_relax -var structure $structure)
+    log=$(lmp_omp_edited -in in.thermal_relax -var gbname $name -var structure_name $structure)
 fi
-echo $log > log_thermal_relax.txt 
 echo; echo "LAMMPS task done, plotting..."; echo
-python plot_thermal_relax.py
 
+mkdir ../GB_projects/$name/images
+python plot_thermal_relax.py $name $mean_width
+cd ..
 echo; echo "All done"; echo
