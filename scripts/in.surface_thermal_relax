@@ -3,47 +3,71 @@ clear
 
 units metal
 atom_style atomic
-boundary p p f
+boundary p p s
 
-variable name index STGB_210
-variable dt equal 0.001 #ps
-variable T index 500
-variable initial_relaxation_steps index 3000
+variable gbname index STGB_210 #should be selected by user
+variable structure_name index thermal_relaxed_T500_steps100000.dat #should be selected by user
+
+variable self index surface_thermal_relax
+
+variable path index GB_projects
+variable pot_path index potentials
+variable home index scripts
+variable thermo_output index thermo_output
+variable dump index dump
+variable structure index ${path}/${gbname}/${structure_name}
+variable gbpath index ${path}/${gbname}
+
+shell mkdir ../${gbpath}/logs
+log ../${gbpath}/logs/${self}.log
+
+variable thermo_step_STR equal 500
+variable dump_step_STR equal 500
+variable rnd_seed_STR index 12345
+variable zlo_mobile_STR equal 6.7
+include ../${gbpath}/input.txt #T, dt, potnames, S_nx, S_ny, S_nz, surface_relax_steps, [zlo_mobile_STR, thermo_step_STR, dump_step_STR, rnd_seed_STR]
+variable dt equal ${dt_STR}
+variable potname index ${potname_pure}
+
+variable dump_path index ${gbpath}/${dump}/${self}
+shell mkdir ../${gbpath}/${dump}
+shell mkdir ../${dump_path}
+
 timestep ${dt}
 
 # ATOMS DEFINITION
-read_data ${name}_relaxed_${T}.dat 
-replicate 3 1 3
+read_data ../${structure} 
+replicate ${S_nx} ${S_ny} ${S_nz}
 region vac block EDGE EDGE EDGE EDGE $((zlo+zhi)/2) EDGE
 delete_atoms region vac compress yes
-region mobile block EDGE EDGE EDGE EDGE 6.7 EDGE
+region mobile block EDGE EDGE EDGE EDGE ${zlo_mobile_STR} EDGE
 group mobile region mobile
 ######################################
 # DEFINE INTERATOMIC POTENTIAL
 
-include GB_potential_Ag.txt
+shell cd ../${pot_path}
+include ${potname}
+shell cd ../${home}
 
 ######################################
 # FIXES
 compute peratom all pe/atom
-write_dump all cfg dump.segregation_start.cfg mass type xs ys zs
-print """
-
-
-Relaxation ${initial_relaxation_steps}
-
-
-"""
 thermo_style custom step time temp pe
-thermo 100
-variable file index surface_thermal_relax.txt
+thermo ${thermo_step_STR}
+shell mkdir ../${gbpath}/${thermo_output}
+variable file index ../${gbpath}/${thermo_output}/${self}.txt
 print "##dt = ${dt}" file ${file} screen no
-print "#time; temp; pe; conc" append ${file} screen no
-fix out all print 100 "$(time); $(temp); $(pe)" append ${file} screen no
+print "#time; temp; pe;" append ${file} screen no
+fix out all print ${thermo_step_STR} "$(time); $(temp); $(pe)" append ${file} screen no
 shell mkdir "dump_surface_thermal_relax"
-dump 1 all cfg 500 dump_surface_thermal_relax/dump.${name}_*.cfg mass type xs ys zs c_peratom
+dump 1 all cfg ${dump_step_STR} ../${dump_path}/dump_*.cfg mass type xs ys zs c_peratom
 dump_modify 1 element Ag Ag
 fix NVT mobile nvt temp ${T} ${T} $(100*dt) 
-run ${initial_relaxation_steps}
-write_data ${name}_surface_thermal_relaxed_T_${T}.dat
+run ${surface_relax_steps}
+
+shell cd ../${gbpath}
+write_data surface_thermal_relaxed_T${T}_steps${surface_relax_steps}.dat
+shell cd ../../${home} 
+shell rm log.lammps
+print "All done"
 

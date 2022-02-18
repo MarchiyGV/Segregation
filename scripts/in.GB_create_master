@@ -30,7 +30,7 @@ variable gbname index STGB_210 #should be selected by user
 variable path index GB_projects
 variable pot_path index potentials
 variable home index scripts
-variable 0K_stuctures index 0K_stuctures
+variable 0K_structures index 0K_structures
 
 shell mkdir ../${path}/${gbname}/logs
 log ../${path}/${gbname}/logs/GB_create_master.log
@@ -132,4 +132,6 @@ jump in.GB_create_master loopb
 variable b delete 
 next a 
 jump in.GB_create_master loopa 
+
+shell rm log.lammps
 print "All done"

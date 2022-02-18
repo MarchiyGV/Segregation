@@ -24,8 +24,8 @@ log ../${gbpath}/logs/${self}.log
 variable thermo_step_TR equal 500
 variable dump_step_TR equal 500
 variable rnd_seed_TR index 12345
-include ../${gbpath}/input.txt #T, dt, potnames, nx, ny, nz, thermal_relax_steps, [thermo_step_TR, dump_step_TR, rnd_seed_TR]
-
+include ../${gbpath}/input.txt #T, dt_TR, potnames, nx, ny, nz, thermal_relax_steps, [thermo_step_TR, dump_step_TR, rnd_seed_TR]
+variable dt equal ${dt_TR}
 
 variable potname index ${potname_pure}
 
@@ -68,4 +68,5 @@ shell cd ../${gbpath}
 write_data thermal_relaxed_T${T}_steps${thermal_relax_steps}.dat
 shell cd ../../${home} 
 
+shell rm log.lammps
 print "All done"
