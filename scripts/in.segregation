@@ -3,51 +3,72 @@ clear
 
 units metal
 atom_style atomic
-boundary p p f
+boundary p p s
 
-variable name index STGB_210
-variable conc index 1
-variable dt equal 0.001 #ps
+variable gbname index STGB_210 #should be selected by user
+variable structure_name index surface_thermal_relaxed_T500_steps1000.dat #should be selected by user
+
+variable self index segregation
+
+variable path index GB_projects
+variable pot_path index potentials
+variable home index scripts
+variable thermo_output index thermo_output
+variable dump index dump
+variable structure index ${path}/${gbname}/${structure_name}
+variable gbpath index ${path}/${gbname}
+
+shell mkdir ../${gbpath}/logs
+log ../${gbpath}/logs/${self}.log
+shell rm log.lammps
+
+variable conc_f index -1
+variable kappa_f index -1
+
+variable thermo_step_S equal 500
+variable dump_step_S equal 500
+variable rnd_seed_S index 12345
+variable zlo_mobile_S equal 6.7
 variable md_steps equal 100
 variable mc_steps equal 10
 variable mu equal 1
-variable T index 500
-variable kappa index 10
-variable yGBw index 10
+variable kappa equal 10
+variable S_nx equal 1 # replication
+variable S_ny equal 1 # replication
+variable S_nz equal 1 # replication 
+include ../${gbpath}/input.txt #T, dt, potnames, conc, [S_n(x,y,z), mu, kappa, md_steps, mc_steps, zlo_mobile_STR, thermo_step_STR, dump_step_STR, rnd_seed_STR]
+variable dt equal ${dt_S}
+variable potname index ${potname_alloy}
+if "${conc_f}!=-1" then "variable conc equal ${conc_f}"
+if "${kappa_f}!=-1" then "variable kappa equal ${kappa_f}"
+
+variable dump_path index ${gbpath}/${dump}/${self}
+shell mkdir ../${gbpath}/${dump}
+shell mkdir ../${dump_path}
+
 timestep ${dt}
 
 # ATOMS DEFINITION
-read_data ${name}_surface_thermal_relaxed_T_${T}.dat
-group 1 type 1
-group 2 type 2
-compute y1 1 reduce ave y
-compute y2 2 reduce ave y
-variable yGB1 equal "(count(1)*c_y1+count(2)*c_y2)/count(all)"
-variable yGB2 equal "(count(1)*(c_y1+ly)+count(2)*c_y2)/count(all)"
-variable file_tmp1 index yGB1.txt
-variable file_tmp2 index yGB2.txt
-fix tmp1 all print 1 "variable yGB1 equal $(v_yGB1)" file ${file_tmp1} screen yes
-fix tmp2 all print 1 "variable yGB2 equal $(v_yGB2)" file ${file_tmp2} screen yes
-run 0
-variable yGB1 delete
-variable yGB2 delete
-include ${file_tmp1}
-include ${file_tmp2}
-unfix tmp1
-unfix tmp2
-
+read_data ../${structure}
 set type 2 type 1
-region mobile block EDGE EDGE EDGE EDGE 6.7 EDGE
+replicate ${S_nx} ${S_ny} ${S_nz}
+print """
+#####################
+lx, ly, lz: 
+$(lx), $(ly), $(lz)
+---
+lx/4, ly/4, lz/4: 
+$(lx/4), $(ly/4), $(lz/4)
+#####################
+"""
+region mobile block EDGE EDGE EDGE EDGE ${zlo_mobile_S} EDGE
 group mobile region mobile
-region GB1 block EDGE EDGE $(v_yGB1-v_yGBw/2) $(v_yGB1+v_yGBw/2) EDGE EDGE
-region GB2 block EDGE EDGE $(v_yGB2-v_yGBw/2) EDGE EDGE EDGE
-region GB3 block EDGE EDGE EDGE $(v_yGB2-ly+v_yGBw/2) EDGE EDGE
-region GBs union 3 GB1 GB2 GB3
-group GBs region GBs
 ######################################
 # DEFINE INTERATOMIC POTENTIAL
 
-include GB_potential_AgNi.txt
+shell cd ../${pot_path}
+include ${potname}
+shell cd ../${home}
 
 ######################################
 # FIXES
@@ -57,15 +78,16 @@ fix NVT mobile nvt temp ${T} ${T} $(100*dt)
 
 variable conc_avg equal f_sgcmc[4]*100
 thermo_style custom step time temp pe v_conc_avg v_mu
-thermo 100
-variable file index segregation_${name}_Ni_${conc}_k_${kappa}.txt
+thermo ${thermo_step_S}
+shell mkdir ../${gbpath}/${thermo_output}
+variable file index ../${gbpath}/${thermo_output}/${self}_Ni_${conc}_k_${kappa}.txt
 print "##dt = ${dt}" file ${file} screen no
 print "#time; temp; pe; conc" append ${file} screen no
-fix out all print 100 "$(time); $(temp); $(pe); $(f_sgcmc[3])" append ${file} screen no
-variable stting_tmp string "dump_segregation_${name}_Ni_${conc}_k_${kappa}"
-shell mkdir ${stting_tmp}
-dump 1 all cfg 500 ${stting_tmp}/dump.*.cfg mass type xs ys zs c_peratom
+fix out all print ${thermo_step_S} "$(time); $(temp); $(pe); $(f_sgcmc[3])" append ${file} screen no
+dump 1 all cfg ${dump_step_S} ../${dump_path}/dump_Ni_${conc}_k_${kappa}_*.cfg mass type xs ys zs c_peratom
 dump_modify 1 element Ag Ni
+
+
 ######################################
 # START
 fix sgcmc all sgcmc ${md_steps} 1 ${T} ${mu} variance ${kappa} $(v_conc/100)
@@ -86,5 +108,9 @@ variable mut delete
 print "mu = ${mu}"
 unfix sgcmc
 fix sgcmc all sgcmc ${md_steps} 1 ${T} ${mu} variance ${kappa} $(v_conc/100)
-write_data ${name}_Ni_${conc}_k_${kappa}.dat
+
+shell cd ../${gbpath}
+write_data ${self}_Ni_${conc}_k_${kappa}.dat
+shell cd ../../${home} 
+
 jump SELF main_loop
