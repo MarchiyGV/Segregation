@@ -33,7 +33,7 @@ variable dt_STR equal 0.001
 
 variable SR_nx equal 3 # replication
 variable SR_ny equal 1 # replication
-variable SR_nz equal 3 # Replication #would be divided by 2 (cut)
+variable SR_nz equal 5 # Replication #would be divided by 2 (cut)
 
 variable thermo_step_STR equal 200
 variable dump_step_STR equal 500

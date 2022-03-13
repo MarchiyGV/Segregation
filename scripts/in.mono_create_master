@@ -1,0 +1,68 @@
+# DESCRIPTION:
+# - This file will generate numerous input files for LAMMPS using a large number of grain boundaries 
+# - This file works for symmetric tilt and twist grain boundaries  
+# - This file needs to modify periodic distance solver for asymmetric or mixed tilt-twist (general) GBs
+#
+# VARIABLES PASSED IN THROUGH COMMAND LINE
+# variable gbname == directory name
+#
+# SYNTAX:
+# lmp_executable < in.GB_create_master
+#
+# ROUTINES REQUIRED
+# 100STGB_210.txt, GB_potential.txt, in.find_minimum.txt, GB_minimize.txt, GB_params.txt, GB_params_material.txt 
+# ----------
+# 100STGB_210.txt == a file that contains the crystal orientations of the two lattices
+# GB_potential.txt == the potential file
+# in.find_minimum.txt == find lattice constant, energy of minimum energy fcc/bcc structure (checks for fcc/bcc)
+# GB_params.txt == extra parameters for minimization, GB distances, etc.
+# GB_params_material.txt == material parameters, periodic distances, translations, overlap distances, etc.
+#################################################################
+
+variable name index mono_001 #should be selected by user
+
+variable path index GB_projects
+variable pot_path index potentials
+variable home index scripts
+variable 0K_structures index 0K_structures
+
+shell mkdir ../${path}/${name}/logs
+log ../${path}/${name}/logs/GB_create_master.log
+
+include minimization_params.txt
+include ../${path}/${name}/input.txt #can overrite minimization_params.txt
+
+variable potname index ${potname_pure}
+variable oriname index ../${path}/${name}/orientation.txt
+
+
+include in.find_minimum.txt
+include ${oriname}
+include minimization_params.txt
+include find_minimum_mono_supercell.txt
+clear 
+units metal 
+dimension 3 
+boundary p p p 
+atom_style atomic
+atom_modify map array
+
+lattice ${lattype} ${latparam} orient x ${x1} ${x2} ${x3} orient y ${y1} ${y2} ${y3} orient z ${z1} ${z2} ${z3} 
+region whole block 0.0 ${Lx_s} 0.0 ${Ly_s} 0.0 ${Lz_s} units box 
+create_box 2 whole 
+create_atoms 1 region whole
+
+shell cd ../${pot_path}
+include ${potname}
+shell cd ../${home}
+
+include mono_minimize.txt
+ 
+# ---------- Write datafile into GB Directory ------------- 
+shell mkdir ../${path}/${name}/${0K_structures} 
+shell cd ../${path}/${name}/${0K_structures} 
+write_data ${name}.dat
+shell cd ../../../${home} 
+
+shell rm log.lammps
+print "All done"

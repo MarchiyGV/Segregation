@@ -9,18 +9,20 @@ variable gbname index STGB_210 #should be selected by user
 variable structure_name index surface_thermal_relaxed_T500_steps1000.dat #should be selected by user
 
 variable self index segregation
-
+variable dat index dat
 variable path index GB_projects
 variable pot_path index potentials
 variable home index scripts
 variable thermo_output index thermo_output
 variable dump index dump
-variable structure index ${path}/${gbname}/${structure_name}
+variable structure index ${path}/${gbname}/${dat}/${structure_name}
 variable gbpath index ${path}/${gbname}
 
 shell mkdir ../${gbpath}/logs
 log ../${gbpath}/logs/${self}.log
 shell rm log.lammps
+
+shell mkdir ../${gbpath}/${dat}
 
 variable conc_f index -1
 variable kappa_f index -1
@@ -52,6 +54,7 @@ timestep ${dt}
 read_data ../${structure}
 set type 2 type 1
 replicate ${S_nx} ${S_ny} ${S_nz}
+#change_box all z final $(zlo) $(zhi+v_dz) units box
 print """
 #####################
 lx, ly, lz: 
@@ -109,8 +112,8 @@ print "mu = ${mu}"
 unfix sgcmc
 fix sgcmc all sgcmc ${md_steps} 1 ${T} ${mu} variance ${kappa} $(v_conc/100)
 
-shell cd ../${gbpath}
+shell cd ../${gbpath}/${dat}
 write_data ${self}_Ni_${conc}_k_${kappa}.dat
-shell cd ../../${home} 
+shell cd ../../../${home} 
 
 jump SELF main_loop

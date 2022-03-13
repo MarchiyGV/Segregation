@@ -1,14 +1,37 @@
 clear
 
-variable name index "STGB_210"
-variable potname string GB_potential_Ag.txt
-variable Lz index 11.5
-variable Lvac index 10
-variable x0 index 6
-variable structure index STGB_210_Ni_1_k_100.dat
 
+variable gbname index STGB_210 #should be selected by user
+variable structure_name index surface_thermal_relaxed_T500_steps1000.dat #should be selected by user
+variable input index slice_input
+
+variable self index slicing
+variable dat index dat
+variable slices index slices
+variable path index GB_projects
+variable home index scripts
+variable thermo_output index thermo_output
+variable dump index dumps
+variable structure index ${path}/${gbname}/${dat}/${structure_name}
+variable gbpath index ${path}/${gbname}
+variable oriname index ../${path}/${gbname}/orientation.txt
+
+shell mkdir ../${gbpath}/logs
+log ../${gbpath}/logs/${self}.log
+shell rm log.lammps
+
+variable dump_path index ${gbpath}/${dump}/${self}
+shell mkdir ../${gbpath}/${dump}
+shell mkdir ../${dump_path}
+
+shell mkdir ../${gbpath}/${slices}
+
+include ../${gbpath}/${input}.txt
+
+variable pot_path index potentials
+variable potname index ${potname_pure}
 include in.find_minimum.txt
-include ${name}.txt
+include ${oriname}
 variable xsize1 equal "sqrt(v_x11^2 + v_x12^2 + v_x13^2)"  
 variable xsize2 equal "sqrt(v_x21^2 + v_x22^2 + v_x23^2)" 
 if "${xsize1} <= ${xsize2}" then "variable xsize equal ${xsize1}" else "variable xsize equal ${xsize2}" 
@@ -16,7 +39,7 @@ variable xlen equal "(v_xsize * v_a0)"
 print "${xlen}" 
 
 delete_atoms group all compress no
-read_data minimized_${structure} add append
+read_data ../${structure} add append
 
 compute z0 all reduce max z
 variable file_tmp index z0.txt
@@ -27,15 +50,23 @@ include ${file_tmp}
 unfix tmp
 uncompute z0
 print "${z0}"
-write_dump all cfg dump1.cfg mass type xs ys zs
+shell "rm ${file_tmp}"
+write_dump all cfg ../${dump_path}/dump_1.cfg mass type xs ys zs
 change_box all boundary f f f
 change_box all x final $(v_x0-v_xlen/2) $(v_x0+v_xlen/2) units box
-write_dump all cfg dump2.cfg mass type xs ys zs 
+write_dump all cfg ../${dump_path}/dump_2.cfg mass type xs ys zs 
 change_box all z final $(v_z0-v_Lz) $(v_z0+v_Lvac) units box
-write_dump all cfg dump3.cfg mass type xs ys zs
+write_dump all cfg ../${dump_path}/dump_3.cfg mass type xs ys zs
 region outside block EDGE EDGE EDGE EDGE EDGE EDGE side out 
 delete_atoms region outside compress yes
 region outside delete
-write_dump all cfg dump4.cfg mass type xs ys zs
+write_dump all cfg ../${dump_path}/dump_4.cfg mass type xs ys zs
 change_box all boundary p p f
-write_data ${name}_slab.dat
+
+
+
+shell mkdir ../${gbpath}/${slices}
+
+shell cd ../${gbpath}/${slices} 
+write_data ${input}.dat
+shell cd ../../../${home}

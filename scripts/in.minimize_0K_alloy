@@ -13,13 +13,16 @@ variable path index GB_projects
 variable pot_path index potentials
 variable home index scripts
 variable thermo_output index thermo_output
-variable dump index dump
-variable structure index ${path}/${gbname}/${structure_name}
+variable dump index dumps
+variable dat index dat
+variable structure index ${path}/${gbname}/${dat}/${structure_name}
 variable gbpath index ${path}/${gbname}
 
 shell mkdir ../${gbpath}/logs
 log ../${gbpath}/logs/${self}.log
 shell rm log.lammps
+
+shell mkdir ../${gbpath}/${dat}
 
 variable thermo_step_M equal 100
 variable dump_step_M equal 500
@@ -61,8 +64,8 @@ fix 1 all box/relax x 0.0 y 0.0 couple xy vmax 0.01
 min_style cg 
 minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
 
-shell cd ../${gbpath}
+shell cd ../${gbpath}/${dat}
 write_data ${self}_${structure_name}
-shell cd ../../${home}
+shell cd ../../../${home}
 
 print "All done"

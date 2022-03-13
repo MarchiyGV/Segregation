@@ -35,4 +35,4 @@ ax3.set_title(f'rolling mean over {n}')
 f.suptitle(f'Surface thermal relax {name} {round(t[-1])}ps')
 f.tight_layout()
 plt.savefig(f'../GB_projects/{name}/images/plot.surface_thermal_relax_time{round(t[-1])}.png')
-
+plt.show()

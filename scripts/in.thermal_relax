@@ -15,11 +15,15 @@ variable home index scripts
 variable 0K_structures index 0K_structures
 variable thermo_output index thermo_output
 variable dump index dump
+variable dat index dat
 variable structure index ${path}/${gbname}/${0K_structures}/${structure_name}
 variable gbpath index ${path}/${gbname}
 
 shell mkdir ../${gbpath}/logs
 log ../${gbpath}/logs/${self}.log
+shell rm log.lammps
+
+shell mkdir ../${gbpath}/${dat}
 
 variable thermo_step_TR equal 500
 variable dump_step_TR equal 500
@@ -64,9 +68,9 @@ velocity all create $(v_T*2) ${rnd_seed_TR} mom no rot no
 fix NPT all npt temp ${T} ${T} $(100*dt) iso 0 0 $(1000.0*dt)
 run ${thermal_relax_steps}
 
-shell cd ../${gbpath}
+shell cd ../${gbpath}/${dat}
 write_data thermal_relaxed_T${T}_steps${thermal_relax_steps}.dat
-shell cd ../../${home} 
+shell cd ../../../${home} 
 
 shell rm log.lammps
 print "All done"

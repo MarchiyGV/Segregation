@@ -1,12 +1,19 @@
 #!/bin/bash
 verbose=false
-while getopts v:n: flag
+while getopts v:n:h: flag
 do
     case "${flag}" in
+        h) help=true;;
         v) verbose=true;;
         n) name=${OPTARG};;
     esac
 done
+
+if [ $help ]; then
+    echo "-n : name"
+    echo "-v : verbose (print any key)"
+    exit 0
+fi
 
 echo "$name"
 
@@ -14,10 +21,10 @@ echo; echo "Starting LAMMPS procedure..."; echo;
 
 cd scripts
 if [ $verbose = "true" ]; then
-    lmp_omp_edited -in in.GB_create_master -var gbname $name 
+    lmp_omp_edited -in in.mono_create_master -var name $name 
 else
     echo "non verb"
-    $(lmp_omp_edited -in in.GB_create_master -var gbname $name)
+    $(lmp_omp_edited -in in.mono_create_master -var name $name )
 fi
 cd ..
 

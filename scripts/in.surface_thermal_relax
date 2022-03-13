@@ -10,17 +10,20 @@ variable structure_name index thermal_relaxed_T500_steps100000.dat #should be se
 
 variable self index surface_thermal_relax
 
+variable dat index dat
 variable path index GB_projects
 variable pot_path index potentials
 variable home index scripts
 variable thermo_output index thermo_output
 variable dump index dump
-variable structure index ${path}/${gbname}/${structure_name}
+variable structure index ${path}/${gbname}/${dat}/${structure_name}
 variable gbpath index ${path}/${gbname}
 
 shell mkdir ../${gbpath}/logs
 log ../${gbpath}/logs/${self}.log
 shell rm log.lammps
+
+shell mkdir ../${gbpath}/${dat}
 
 variable thermo_step_STR equal 500
 variable dump_step_STR equal 500
@@ -65,9 +68,9 @@ dump_modify 1 element Ag Ag
 fix NVT mobile nvt temp ${T} ${T} $(100*dt) 
 run ${surface_relax_steps}
 
-shell cd ../${gbpath}
+shell cd ../${gbpath}/${dat}
 write_data surface_thermal_relaxed_T${T}_steps${surface_relax_steps}.dat
-shell cd ../../${home} 
+shell cd ../../${home}/${dat} 
 
 print "All done"
 

@@ -1,0 +1,71 @@
+# INITIALIZATION
+clear
+
+units metal
+atom_style atomic
+boundary p p s
+variable gbname index STGB_210 #should be selected by user
+variable structure_name index STGB_210_Ni_1_k_100.dat #should be selected by user
+
+variable self index minimize_0K_pure
+
+variable path index GB_projects
+variable pot_path index potentials
+variable home index scripts
+variable thermo_output index thermo_output
+variable dump index dumps
+variable dat index dat
+variable structure index ${path}/${gbname}/${dat}/${structure_name}
+variable gbpath index ${path}/${gbname}
+
+shell mkdir ../${gbpath}/logs
+log ../${gbpath}/logs/${self}.log
+shell rm log.lammps
+
+shell mkdir ../${gbpath}/${dat}
+
+variable thermo_step_M equal 100
+variable dump_step_M equal 500
+include minimization_params.txt
+include ../${gbpath}/input.txt
+variable potname index ${potname_pure}
+variable dump_path index ${gbpath}/${dump}/${self}
+shell mkdir ../${gbpath}/${dump}
+shell mkdir ../${dump_path}
+# ATOMS DEFINITION
+read_data ../${structure}
+
+######################################
+# DEFINE INTERATOMIC POTENTIAL
+
+shell cd ../${pot_path}
+include ${potname}
+shell cd ../${home}
+
+######################################
+# DEFINE THERMO AND OUTPUT
+
+dump 1 all cfg ${dump_step_M} ../${dump_path}/dump_*.cfg mass type xs ys zs
+dump_modify 1 element Ag Ag
+
+
+# ---------- Run Minimization --------------------- 
+#reset_timestep 0 
+thermo ${thermo_step_M}
+thermo_style custom step pe lx ly lz press pxx pyy pzz 
+min_style cg 
+minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
+
+# ---------- Run Minimization 2--------------------- 
+# Now allow the box to expand/contract perpendicular to the grain boundary
+thermo ${thermo_step_M}
+thermo_style custom step pe lx ly lz press pxx pyy pzz 
+fix 1 all box/relax x 0.0 y 0.0 couple xy vmax 0.01
+min_style cg 
+minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
+
+shell cd ../${gbpath}/${dat}
+write_data ${self}_${structure_name}
+shell cd ../../../${home}
+
+print "All done"

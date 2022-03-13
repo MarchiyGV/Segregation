@@ -1,0 +1,22 @@
+variable latparam equal ${a0} 
+variable minimumenergy equal ${ecoh} 
+variable lattype string ${lat} 
+variable overlapboth equal 1 
+variable inc equal "v_latparam / 6" 
+
+variable a0 delete
+variable ecoh delete
+variable lat delete
+
+# Insert x,y,z sizes in LU and calculate in Angstroms 
+variable xsize equal "sqrt(v_x1^2 + v_x2^2 + v_x3^2)" 
+variable ysize equal "sqrt(v_y1^2 + v_y2^2 + v_y3^2)" 
+variable zsize equal "sqrt(v_z1^2 + v_z2^2 + v_z3^2)" 
+
+variable xlen1 equal "(v_xsize * v_latparam)" 
+variable ylen1 equal "(v_ysize * v_latparam)" 
+variable zlen1 equal "(v_zsize * v_latparam)" 
+
+variable Lx_s equal "ceil(v_Lx/v_xlen1)*v_xlen1" 
+variable Ly_s equal "ceil(v_Ly/v_ylen1)*v_ylen1" 
+variable Lz_s equal "ceil(v_Lz/v_zlen1)*v_zlen1" 
