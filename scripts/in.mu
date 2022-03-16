@@ -5,43 +5,43 @@ units metal
 atom_style atomic
 boundary p p s
 variable gbname index STGB_210 #should be selected by user
-variable structure_name index STGB_210_Ni_1_k_100.dat #should be selected by user
+variable structure_name_1 index slice.dat #should be selected by user
+variable structure_name_2 index slice.dat #should be selected by user
+variable input index mu #[.txt] should be selected by user
 
-variable self index minimize_0K
+variable self index mu
 
 variable path index GB_projects
 variable pot_path index potentials
 variable home index scripts
 variable thermo_output index thermo_output
 variable dump index dumps
-variable dat index dat
-variable structure index ${path}/${gbname}/${dat}/${structure_name}
+variable slices index slices
+variable structure_1 index ${path}/${gbname}/${slices}/${structure_name_1}
+variable structure_2 index ${path}/${gbname}/${slices}/${structure_name_2}
 variable gbpath index ${path}/${gbname}
+
 
 shell mkdir ../${gbpath}/logs
 log ../${gbpath}/logs/${self}.log
 shell rm log.lammps
 
-shell mkdir ../${gbpath}/${dat}
-
 variable thermo_step_M equal 100
 variable dump_step_M equal 500
 include minimization_params.txt
-include ../${gbpath}/input.txt
+include ../${gbpath}/${input}.txt
 print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print "----------input----------"
-shell cat ../${gbpath}/input.txt
+shell cat ../${gbpath}/${input}.txt
 print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print " "
-variable potname index ${potname_alloy}
 variable dump_path index ${gbpath}/${dump}/${self}
 shell mkdir ../${gbpath}/${dump}
 shell mkdir ../${dump_path}
 # ATOMS DEFINITION
-read_data ../${structure}
-
+read_data ../${structure_1}
 ######################################
 # DEFINE INTERATOMIC POTENTIAL
 
@@ -53,26 +53,40 @@ shell cd ../${home}
 # DEFINE THERMO AND OUTPUT
 
 dump 1 all cfg ${dump_step_M} ../${dump_path}/dump_*.cfg mass type xs ys zs
-dump_modify 1 element Ag Ni
+if "${type} == pure" then "dump_modify 1 element Ag"
+if "${type} == alloy" then "dump_modify 1 element Ag Ni"
 
 
 # ---------- Run Minimization --------------------- 
-#reset_timestep 0 
+#reset_timestep 0
+compute eng all pe/atom 
+compute eatoms all reduce sum c_eng
+
+run 0
+
+variable file_tmp index ${self}_E.txt
+fix tmp all print 1 "variable E0 equal $(c_eatoms)" file ${file_tmp} screen yes
+run 0
+variable z0 delete
+include ${file_tmp}
+unfix tmp
+shell rm ${file_tmp}
+
+delete_atoms group all compress yes
+read_data ../${structure_2} add append 
+
 thermo ${thermo_step_M}
 thermo_style custom step pe lx ly lz press pxx pyy pzz 
 min_style cg 
 minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
 
-# ---------- Run Minimization 2--------------------- 
-# Now allow the box to expand/contract perpendicular to the grain boundary
-thermo ${thermo_step_M}
-thermo_style custom step pe lx ly lz press pxx pyy pzz 
-fix 1 all box/relax x 0.0 y 0.0 vmax 0.01
-min_style cg 
-minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
+variable file_tmp index ${self}_E.txt
+fix tmp all print 1 "variable E equal $(c_eatoms)" file ${file_tmp} screen yes
+run 0
+include ${file_tmp}
+unfix tmp
+shell rm ${file_tmp}
 
-shell cd ../${gbpath}/${dat}
-write_data ${self}_${structure_name}
-shell cd ../../../${home}
-
+variable mu equal "v_E-v_E0"
+print "mu ${mu}" file ${self}_${input}.out screem yes
 print "All done"

@@ -8,6 +8,7 @@ variable input index slice_input
 variable self index slicing
 variable dat index dat
 variable slices index slices
+variable pot_path index potentials
 variable path index GB_projects
 variable home index scripts
 variable thermo_output index thermo_output
@@ -27,21 +28,37 @@ shell mkdir ../${dump_path}
 shell mkdir ../${gbpath}/${slices}
 
 include ../${gbpath}/${input}.txt
+include ../${gbpath}/input.txt
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "----------slice input----------"
+shell cat ../${gbpath}/${input}.txt
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "----------input----------"
+shell cat ../${gbpath}/input.txt
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 
-variable pot_path index potentials
-variable potname index ${potname_pure}
-include in.find_minimum.txt
-include ${oriname}
-variable xsize1 equal "sqrt(v_x11^2 + v_x12^2 + v_x13^2)"  
-variable xsize2 equal "sqrt(v_x21^2 + v_x22^2 + v_x23^2)" 
-if "${xsize1} <= ${xsize2}" then "variable xsize equal ${xsize1}" else "variable xsize equal ${xsize2}" 
-variable xlen equal "(v_xsize * v_a0)"
-print "${xlen}" 
+variable Nx equal "v_nx*v_SR_nx*v_S_nx"
+print "Nx = ${Nx}"
 
-delete_atoms group all compress no
-read_data ../${structure} add append
+read_data ../${structure} 
+
+if "${type} == pure" then "set type 2 type 1"
+variable xlen equal "v_nx_len*lx/v_Nx"
+print "xlen = ${xlen}"
+
+if "${type} == pure" then "variable potname index ${potname_pure}"
+if "${type} == alloy" then "variable potname index ${potname_alloy}"
+shell cd ../${pot_path}
+include ${potname}
+shell cd ../${home}
 
 compute z0 all reduce max z
+compute eng all pe/atom 
+compute eatoms all reduce sum c_eng
 variable file_tmp index z0.txt
 fix tmp all print 1 "variable z0 equal $(c_z0)" file ${file_tmp} screen yes
 run 0
@@ -50,7 +67,7 @@ include ${file_tmp}
 unfix tmp
 uncompute z0
 print "${z0}"
-shell "rm ${file_tmp}"
+shell rm ${file_tmp}
 write_dump all cfg ../${dump_path}/dump_1.cfg mass type xs ys zs
 change_box all boundary f f f
 change_box all x final $(v_x0-v_xlen/2) $(v_x0+v_xlen/2) units box
@@ -69,4 +86,10 @@ shell mkdir ../${gbpath}/${slices}
 
 shell cd ../${gbpath}/${slices} 
 write_data ${input}.dat
+
+dump out all cfg 1 ${input}*.cfg mass type xs ys zs id c_eng
+dump_modify out element Ag Ni
+reset_timestep 0
+run 0
+shell mv ${input}0.cfg ${input}.cfg 
 shell cd ../../../${home}

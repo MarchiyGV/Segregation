@@ -29,6 +29,13 @@ variable thermo_step_TR equal 500
 variable dump_step_TR equal 500
 variable rnd_seed_TR index 12345
 include ../${gbpath}/input.txt #T, dt_TR, potnames, nx, ny, nz, thermal_relax_steps, [thermo_step_TR, dump_step_TR, rnd_seed_TR]
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "----------input----------"
+shell cat ../${gbpath}/input.txt
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print " "
 variable dt equal ${dt_TR}
 
 variable potname index ${potname_pure}

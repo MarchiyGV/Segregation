@@ -30,6 +30,13 @@ variable dump_step_STR equal 500
 variable rnd_seed_STR index 12345
 variable zlo_mobile_STR equal 6.7
 include ../${gbpath}/input.txt #T, dt, potnames, SR_nx, SR_ny, SR_nz, surface_relax_steps, [zlo_mobile_STR, thermo_step_STR, dump_step_STR, rnd_seed_STR]
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "----------input----------"
+shell cat ../${gbpath}/input.txt
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print " "
 variable dt equal ${dt_STR}
 variable potname index ${potname_pure}
 

@@ -31,6 +31,13 @@ log ../${path}/${gbname}/logs/GB_create_master.log
 
 include minimization_params.txt
 include ../${path}/${gbname}/input.txt #can overrite minimization_params.txt
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "----------input----------"
+shell cat ../${gbpath}/input.txt
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print " "
 
 variable potname index ${potname_pure}
 variable oriname index ../${path}/${gbname}/orientation.txt

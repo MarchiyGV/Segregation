@@ -1,0 +1,4 @@
+pair_style eam/fs
+pair_coeff * * Ag-Ni.eam.fs.txt Ag
+neighbor 2.0 bin 
+neigh_modify delay 10 check yes 

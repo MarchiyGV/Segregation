@@ -39,6 +39,13 @@ variable S_nx equal 1 # replication
 variable S_ny equal 1 # replication
 variable S_nz equal 1 # replication 
 include ../${gbpath}/input.txt #T, dt, potnames, conc, [S_n(x,y,z), mu, kappa, md_steps, mc_steps, zlo_mobile_STR, thermo_step_STR, dump_step_STR, rnd_seed_STR]
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "----------input----------"
+shell cat ../${gbpath}/input.txt
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print " "
 variable dt equal ${dt_S}
 variable potname index ${potname_alloy}
 if "${conc_f}!=-1" then "variable conc equal ${conc_f}"

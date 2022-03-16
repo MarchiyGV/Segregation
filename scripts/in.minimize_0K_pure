@@ -28,6 +28,13 @@ variable thermo_step_M equal 100
 variable dump_step_M equal 500
 include minimization_params.txt
 include ../${gbpath}/input.txt
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "----------input----------"
+shell cat ../${gbpath}/input.txt
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print " "
 variable potname index ${potname_pure}
 variable dump_path index ${gbpath}/${dump}/${self}
 shell mkdir ../${gbpath}/${dump}

@@ -3,4 +3,4 @@ variable Lz index 11.5
 variable Lvac index 15
 variable x0 index 6.1
 variable nx_len index 1
-variable type index alloy
+variable type index pure 
