@@ -15,10 +15,9 @@ variable path index GB_projects
 variable pot_path index potentials
 variable home index scripts
 variable thermo_output index thermo_output
-variable dump index dumps
-variable slices index slices
-variable structure_1 index ${path}/${gbname}/${slices}/${structure_name_1}
-variable structure_2 index ${path}/${gbname}/${slices}/${structure_name_2}
+variable dump index dump
+variable structure_1 index ${path}/${gbname}/${structure_name_1}
+variable structure_2 index ${path}/${gbname}/${structure_name_2}
 variable gbpath index ${path}/${gbname}
 
 
@@ -29,10 +28,11 @@ shell rm log.lammps
 variable thermo_step_M equal 100
 variable dump_step_M equal 500
 include minimization_params.txt
-include ../${gbpath}/${input}.txt
+
 print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print "----------input----------"
+include ../${gbpath}/${input}.txt
 shell cat ../${gbpath}/${input}.txt
 print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
@@ -42,6 +42,7 @@ shell mkdir ../${gbpath}/${dump}
 shell mkdir ../${dump_path}
 # ATOMS DEFINITION
 read_data ../${structure_1}
+if "${type} == pure" then "set type 2 type 1"
 ######################################
 # DEFINE INTERATOMIC POTENTIAL
 
@@ -74,6 +75,7 @@ shell rm ${file_tmp}
 
 delete_atoms group all compress yes
 read_data ../${structure_2} add append 
+if "${type} == pure" then "set type 2 type 1"
 
 thermo ${thermo_step_M}
 thermo_style custom step pe lx ly lz press pxx pyy pzz 
@@ -87,6 +89,7 @@ include ${file_tmp}
 unfix tmp
 shell rm ${file_tmp}
 
-variable mu equal "v_E-v_E0"
-print "mu ${mu}" file ${self}_${input}.out screem yes
+
+variable mu equal "v_E0-v_E"
+print "!mu ${mu}" file ${self}_${input}.out screen yes
 print "All done"
