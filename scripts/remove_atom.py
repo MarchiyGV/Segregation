@@ -71,7 +71,7 @@ def main(args):
 
     if type(ids)==int:
         ids = [ids]
-
+    global out
     if args.postproc:
         ind=[]
         for id in ids:
@@ -79,10 +79,17 @@ def main(args):
             ind.append(list(data0.particles['Particle Identifier']).index(id))
         x = np.array(data0.particles['Position'][:, 0])[ind]
         y = np.array(data0.particles['Position'][:, 1])[ind]
-        out = f'#mu for surface of {file}\n#id mu\n'
+        xlen = data0.cell_[0,0]
+        ylen = data0.cell_[1,1]
+        xmin = data0.cell_[0,3]
+        ymin = data0.cell_[1,3]
+        print(xmin, ymin)
+        out =  f'##mu for surface of {file}\n##xlen = {xlen}\n##ylen = {ylen}\n'
+        out += f'##xmin = {xmin}\n##ymin = {ymin}\n##id mu x y\n'
         mus = []
-
-    for id in ids:
+    
+    def do_stuff(i, id):
+        global out
         pipeline_i = import_file(file)
         selection = Selection(expression=f'ParticleIdentifier=={id}')
         pipeline_i.modifiers.append(selection)
@@ -109,11 +116,8 @@ def main(args):
             outtype="lammps/dump"
             properties.append("c_eng")
             export_file(pipeline_i, f"{tmppath}{outname}", outtype, columns = properties)
-
         
-        
-        if args.postproc:
-            
+        if args.postproc:            
             log =  os.popen(f'lmp_omp_edited -in in.mu '+
                             f'-var gbname {args.name} '+
                             f'-var structure_name_1 slices/{args.src[0]} '+
@@ -127,11 +131,12 @@ def main(args):
                         mu = float(line.split()[-1])
                         print(id, mu)
                         mus.append(mu)
-                        out+=f'{id} {mu}\n'
+                        out+=f'{id} {mu} {x[i]} {y[i]}\n'
+
+    for i, id in enumerate(ids):
+        do_stuff(i, id)
+
     if args.postproc:
-        print(out)
-        with open(f'{path}mu_{args.src[0]}', 'w') as f:
-            f.write(out)
         if args.contourplot:
             from scipy import interpolate
             interp = interpolate.interp2d(x, y, mus, bounds_error=False, fill_value=0)
@@ -164,11 +169,15 @@ def main(args):
             ni_ind = []
             ni_x = []
             ni_y = []
+            ni_z = []
+            out+='## Ni positions: id, x, y, z\n'
             for i, tp in enumerate(data0.particles['Particle Type']):
                 if tp==2:
                     ni_ind.append(i)
                     ni_x.append((data0.particles['Position'][:, 0])[i])
                     ni_y.append((data0.particles['Position'][:, 1])[i])   
+                    ni_z.append((data0.particles['Position'][:, 2])[i])
+                    out+=f'#Ni {i} {ni_x[-1]} {ni_y[-1]} {ni_z[-1]}\n'
             if args.plot_ni:
                 plt.plot(ni_x, ni_y, 'x')
             xmin = data0.cell_[0,3]
@@ -182,7 +191,9 @@ def main(args):
             plt.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap))
             plt.savefig(f'{impath}mu_{args.src[0]}.png')
             plt.show()
-    
+    print(out)
+    with open(f'{outpath}mu_{args.src[0]}', 'w') as f:
+        f.write(out)
 
 if __name__ == '__main__':
     import argparse

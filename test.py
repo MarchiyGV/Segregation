@@ -68,7 +68,7 @@ opt.run(fmax=0.005)
 # cubic lattic constant
 a = (4*ag.get_volume()/len(ag))**(1.0/3.0)
 print('final lat const:', a)
-slab = fcc100('Ag', (2,2,N_lay), a=a, vacuum=vacuum)
+slab = fcc100('Ag', (4,4,N_lay), a=a, vacuum=vacuum)
 
 mask = [atom.tag == N_lay for atom in slab]
 slab.set_constraint(FixAtoms(mask=mask))
@@ -78,5 +78,6 @@ calc = Espresso(pseudopotentials=pseudopotentials,
                 tstress=True, tprnfor=True, kpts=(3, 3, 1), input_data=input_data_slab)
 slab.calc = calc
 
-dyn = BFGS(slab, trajectory='init_relax.traj')
+dyn = BFGS(slab, trajectory='init_relax_restart.traj')
+dyn.replay_trajectory('init_relax.traj')
 dyn.run(fmax=0.005)

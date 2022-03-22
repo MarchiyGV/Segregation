@@ -1,3 +1,4 @@
+#/home/user/anaconda3/envs/ovito/bin/python
 import argparse
 import scripts.remove_atom as remove_atom
 
@@ -32,4 +33,5 @@ with open(f"GB_projects/{args.name}/{args.postproc}.txt") as f:
             if n>1:
                 args.plot_ni = False
                 break
+
 remove_atom.main(args)
