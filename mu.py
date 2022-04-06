@@ -1,6 +1,7 @@
 #/home/user/anaconda3/envs/ovito/bin/python
 import argparse
 import scripts.remove_atom as remove_atom
+import mu_plot
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-n", "--name", required=True)
@@ -35,3 +36,5 @@ with open(f"GB_projects/{args.name}/{args.postproc}.txt") as f:
                 break
 
 remove_atom.main(args)
+args.file = f'mu_{args.src}'
+mu_plot(args)

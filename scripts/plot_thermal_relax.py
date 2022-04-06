@@ -4,7 +4,8 @@ import pandas as pd
 import sys
 name = sys.argv[1]
 n = int(sys.argv[2])
-file = f"../GB_projects/{name}/thermo_output/thermal_relax.txt"
+inp = sys.argv[3]
+file = f"../GB_projects/{name}/thermo_output/{inp}.txt"
 print(file)
 df = pd.read_csv(file, sep=';', comment='#', names=['t','T', 'P', 'pe'])
 t = df['t']
@@ -41,7 +42,7 @@ ax3.set_ylabel('$<E_{pot}>_{roll}, eV$')
 ax4.set_ylabel('$<P>_{roll}, bar$')
 ax3.set_title(f'rolling mean over {n}')
 ax4.set_title(f'rolling mean over {n}')
-f.suptitle(f'Thermal relax {name} {round(t[-1])}ps')
+f.suptitle(f"{inp.replace('_', ' ')} {name} {round(t[-1])}ps")
 f.tight_layout()
-plt.savefig(f'../GB_projects/{name}/images/plot.thermal_relax_time{round(t[-1])}.png')
+plt.savefig(f'../GB_projects/{name}/images/plot.{inp}_time{round(t[-1])}.png')
 plt.show()

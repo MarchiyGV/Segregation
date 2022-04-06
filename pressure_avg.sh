@@ -1,8 +1,9 @@
 #!/bin/bash
 verbose=false
+plot=false
 mean_width=50
 job=4
-while getopts v:n:s:m:j: flag
+while getopts v:n:s:m:j:p: flag
 do
     case "${flag}" in
         v) verbose=true;;
@@ -10,6 +11,7 @@ do
         s) structure=${OPTARG};;
         m) mean_width=${OPTARG};;
         j) job=${OPTARG};;
+        p) plot=true;;
         *) echo "Unknonwn option ${flag}"; exit 1;;
     esac
 done
@@ -25,18 +27,19 @@ else
         exit 1
     fi
 fi
+
 echo; echo "Starting LAMMPS procedure..."; echo;
-
 cd scripts
+if [ $plot = false ]; then
 if [ $verbose = true ]; then
-    lmp_omp_edited -in in.surface_thermal_relax -var gbname $name -var structure_name $structure -pk omp ${job} -sf omp
+    lmp_omp_edited -in in.pressure_average -var gbname $name -var structure_name $structure -pk omp ${job} -sf omp
 else
-    $(lmp_omp_edited -in in.surface_thermal_relax -var gbname $name -var structure_name $structure -pk omp ${job} -sf omp )
+    log=$(lmp_omp_edited -in in.pressure_average -var gbname $name -var structure_name $structure -pk omp ${job} -sf omp)
 fi
-
+fi
 echo; echo "LAMMPS task done, plotting..."; echo
 
-python plot_surface_thermal_relax.py $name $mean_width
-
+mkdir ../GB_projects/$name/images
+python plot_thermal_relax.py $name $mean_width pressure_average
 cd ..
 echo; echo "All done"; echo

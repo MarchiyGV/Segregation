@@ -1,22 +1,24 @@
-w = 3000
-st = 100
-name = 'STGB_210_Ni_1_k_100'
-n = 500
-s1 = 10
-
+import argparse
 import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
-import sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-n", "--name", required=True)
+parser.add_argument("-s", "--structure", required=True, dest='src')
+parser.add_argument("--w", type=int, default=3000, required=False, help='width of linear regression region for calculating slope')
+parser.add_argument("--st", type=int, default=100, required=False, help='step for points in which slope will be calculated')
+parser.add_argument("--num", type=int, default=500, required=False, help="width of rolling mean window")
+parser.add_argument("--s1", type=int, default=10, required=False, help='starting point for avg dat')
+args = parser.parse_args()
+w = args.w
+st = args.st
+n = args.num
+s1 = args.s1
+
 color_red = 'tab:red'
 
-w, st, n, s1 = sys.argv[1:]
-w = int(w)
-st = int(st)
-n = int(n)
-s1 = int(s1)
-
-file = f"segregation_{name}.txt"
+file = f"../GB_projects/{args.name}/thermo_output/{args.src}"
 df = pd.read_csv(file, sep=';', comment='#', names=['time','temp', 'pe', 'conc'])
 t = df['time']
 pe = df['pe']
@@ -60,9 +62,9 @@ ax2.set_ylabel('$concentration$', color=color_red)
 ax3.set_xlabel(f'$step\cdot {st}$')
 ax3.set_ylabel('$\partial_t<E_{pot}>_{roll}, eV/step$')
 ax3.plot(res, 'o')
-f.suptitle(name)
+f.suptitle(args.name)
 f.tight_layout()
 ax1.text(0.1, 0.95, f'rolling mean over {n}', transform=ax1.transAxes)
 ax3.text(0.5, 0.02, f'dx = {w}', transform=ax3.transAxes)
-plt.savefig('plot.segregation.png')
+plt.savefig(f"../GB_projects/{args.name}/images/{(args.src).replace('.txt', '.png')}")
 plt.show()

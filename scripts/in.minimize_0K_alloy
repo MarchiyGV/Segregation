@@ -3,7 +3,7 @@ clear
 
 units metal
 atom_style atomic
-boundary p p s
+boundary p p f
 variable gbname index STGB_210 #should be selected by user
 variable structure_name index STGB_210_Ni_1_k_100.dat #should be selected by user
 

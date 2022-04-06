@@ -3,7 +3,7 @@ clear
 
 units metal
 atom_style atomic
-boundary p p s
+boundary p p f
 
 variable gbname index STGB_210 #should be selected by user
 variable structure_name index surface_thermal_relaxed_T500_steps1000.dat #should be selected by user
@@ -61,7 +61,7 @@ timestep ${dt}
 read_data ../${structure}
 set type 2 type 1
 replicate ${S_nx} ${S_ny} ${S_nz}
-#change_box all z final $(zlo) $(zhi+v_dz) units box
+change_box all z final $(zlo) $(zhi+v_dz) units box
 print """
 #####################
 lx, ly, lz: 

@@ -3,7 +3,8 @@ verbose=false
 mean_width=50
 conc=-1
 kappa=-1
-while getopts v:n:s:mw:c:k: flag
+job=7
+while getopts v:n:s:m:c:k:j: flag
 do
     case "${flag}" in
         v) verbose=true;;
@@ -12,6 +13,7 @@ do
         m) mean_width=${OPTARG};;
         c) conc=${OPTARG};;
         k) kappa=${OPTARG};;
+        j) job=${OPTARG};;
         *) echo "Unknonwn option ${flag}"; exit 1;;
     esac
 done
@@ -32,9 +34,9 @@ echo; echo "Starting LAMMPS procedure..."; echo;
 
 cd scripts
 if [ $verbose = true ]; then
-    lmp_omp_edited -in in.segregation -var gbname $name -var structure_name $structure -var conc_f $conc -var kappa_f $kappa
+    lmp_omp_edited -in in.segregation -var gbname $name -var structure_name $structure -var conc_f $conc -var kappa_f $kappa -pk omp ${job} -sf omp
 else
-    $(lmp_omp_edited -in in.surface_thermal_relax -var gbname $name -var structure_name $structure -var conc_f $conc -var kappa_f $kappa)
+    $(lmp_omp_edited -in in.segregation -var gbname $name -var structure_name $structure -var conc_f $conc -var kappa_f $kappa -pk omp ${job} -sf omp)
 fi
 
 #echo; echo "LAMMPS task done, plotting..."; echo

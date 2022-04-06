@@ -34,7 +34,7 @@ include ../${path}/${gbname}/input.txt #can overrite minimization_params.txt
 print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print "----------input----------"
-shell cat ../${gbpath}/input.txt
+shell cat ../${path}/input.txt
 print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print " "

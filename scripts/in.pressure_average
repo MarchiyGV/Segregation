@@ -1,0 +1,83 @@
+# INITIALIZATION
+clear
+
+units metal
+atom_style atomic
+boundary p p p
+
+variable gbname index STGB_210 #should be selected by user
+variable structure_name index GB_E659_N80_count125.dat #should be selected by user
+
+variable self index pressure_average
+variable path index GB_projects
+variable pot_path index potentials
+variable home index scripts
+variable 0K_structures index 0K_structures
+variable thermo_output index thermo_output
+variable dump index dump
+variable dat index dat
+variable structure index ${path}/${gbname}/${dat}/${structure_name}
+variable gbpath index ${path}/${gbname}
+
+shell mkdir ../${gbpath}/logs
+log ../${gbpath}/logs/${self}.log
+shell rm log.lammps
+
+shell mkdir ../${gbpath}/${dat}
+
+variable thermo_step_BR equal 500
+variable dump_step_BR equal 500
+variable rnd_seed_BR index 12345
+include ../${gbpath}/input.txt #T, dt_TR, potnames, nx, ny, nz, thermal_relax_steps, [thermo_step_TR, dump_step_TR, rnd_seed_TR]
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "----------input----------"
+shell cat ../${gbpath}/input.txt
+print " "
+print "%%%%%%%%%%%%%%%%%%%%%%%%%"
+print " "
+variable dt equal ${dt_BR}
+
+variable potname index ${potname_pure}
+
+variable dump_path index ${gbpath}/${dump}/${self}
+shell mkdir ../${gbpath}/${dump}
+shell mkdir ../${dump_path}
+
+timestep ${dt}
+
+# ATOMS DEFINITION
+read_data ../${structure}
+
+######################################
+# DEFINE INTERATOMIC POTENTIAL
+
+shell cd ../${pot_path}
+include ${potname}
+shell cd ../${home}
+
+######################################
+# DEFINE THERMO AND OUTPUT
+
+thermo_style custom time temp press pe
+thermo ${thermo_step_BR}
+shell mkdir ../${gbpath}/${thermo_output}
+variable file index ../${gbpath}/${thermo_output}/${self}.txt
+print "##dt = ${dt}" file ${file} screen no
+print "#time; temp; press; pe" append ${file} screen no
+fix out all print ${thermo_step_BR} "$(time); $(temp); $(press); $(pe)" append ${file} screen no
+dump 1 all cfg ${dump_step_BR} ../${dump_path}/dump_*.cfg mass type xs ys zs
+dump_modify 1 element Ag Ag
+######################################
+# START
+velocity all create $(v_T*2) ${rnd_seed_BR} mom no rot no
+#fix NPT all npt temp ${T} ${T} $(100*dt) iso 0 0 $(1000.0*dt)
+fix NVT all nvt temp ${T} ${T} $(100*dt)
+run ${berendsen_relax_steps}
+
+shell cd ../${gbpath}/${dat}
+write_data ${self}_T${T}_steps${berendsen_relax_steps}.dat
+shell cd ../../../${home} 
+
+shell rm log.lammps
+print "All done"
