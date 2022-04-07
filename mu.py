@@ -37,4 +37,4 @@ with open(f"GB_projects/{args.name}/{args.postproc}.txt") as f:
 
 remove_atom.main(args)
 args.file = f'mu_{args.src}'
-mu_plot(args)
+mu_plot.main(args)
