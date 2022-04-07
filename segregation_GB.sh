@@ -4,16 +4,20 @@ mean_width=50
 conc=-1
 kappa=-1
 job=7
-while getopts v:n:s:m:c:k:j: flag
+restart=false
+mu=false
+while getopts v:n:s:w:c:k:j:r:m: flag
 do
     case "${flag}" in
         v) verbose=true;;
         n) name=${OPTARG};;
         s) structure=${OPTARG};;
-        m) mean_width=${OPTARG};;
+        w) mean_width=${OPTARG};;
         c) conc=${OPTARG};;
         k) kappa=${OPTARG};;
         j) job=${OPTARG};;
+        r) restart=true;;
+        m) mu=${OPTARG};;
         *) echo "Unknonwn option ${flag}"; exit 1;;
     esac
 done
@@ -31,16 +35,25 @@ else
 fi
 
 echo; echo "Starting LAMMPS procedure..."; echo;
+if [ $restart = true ]; then
+    input="in.segregation_restart"
+else
+    input="in.segregation"
+fi
+
+if [ $mu = false ]; then
+    mu_command=""
+else
+    mu_command="-var mu0 $mu"
+fi
 
 cd scripts
 if [ $verbose = true ]; then
-    lmp_omp_edited -in in.segregation -var gbname $name -var structure_name $structure -var conc_f $conc -var kappa_f $kappa -pk omp ${job} -sf omp
+    lmp_omp_edited -in $input $mu_command -var gbname $name -var structure_name $structure -var conc_f $conc -var kappa_f $kappa -pk omp ${job} -sf omp
 else
-    $(lmp_omp_edited -in in.segregation -var gbname $name -var structure_name $structure -var conc_f $conc -var kappa_f $kappa -pk omp ${job} -sf omp)
+    $(lmp_omp_edited -in $input $mu_command -var gbname $name -var structure_name $structure -var conc_f $conc -var kappa_f $kappa -pk omp ${job} -sf omp)
 fi
 
-#echo; echo "LAMMPS task done, plotting..."; echo
 
-#python plot_thermal_relax.py
 
 echo; echo "All done"; echo
