@@ -142,6 +142,7 @@ def main(args):
                         out+=f'{id} {mu} {x[i]} {y[i]}\n'
 
     for i, id in enumerate(ids):
+        print(f'{i}/{len(ids)}: {round(i/len(ids))}\%')
         do_stuff(i, id)
 
     ni_ind = []
