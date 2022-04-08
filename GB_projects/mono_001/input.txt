@@ -1,0 +1,64 @@
+### --- STGB_221 --- ###
+
+### --- minimisation stats (optional params) --- ###
+#variable etol equal 1.0e-25 
+#variable ftol equal 1.0e-25 
+#variable maxiter equal 5000 
+#variable maxeval equal 10000 
+
+### --- common stats --- ###
+
+variable potname_pure index GB_potential_Ag.txt
+variable potname_alloy index GB_potential_AgNi.txt
+variable Lx equal 10
+variable Ly equal 10
+variable Lz equal 10
+variable T equal 500
+variable dt equal 0.001
+
+### --- in.thermal_relax --- ###
+variable thermal_relax_steps equal 1000000
+variable dt_TR equal 0.001 
+
+variable nx equal 1 # replication
+variable ny equal 1 # replication
+variable nz equal 1 # replication
+
+variable thermo_step_TR equal 200
+variable dump_step_TR equal 500
+#variable rnd_seed_TR index 12345
+
+
+### --- in.surface_thermal_relax --- ###
+variable surface_relax_steps equal 1000000
+variable dt_STR equal 0.001
+
+variable SR_nx equal 1 # replication
+variable SR_ny equal 1 # replication
+variable SR_nz equal 5 # Replication #would be divided by 2 (cut)
+
+variable thermo_step_STR equal 200
+variable dump_step_STR equal 500
+#variable rnd_seed_STR index 12345
+#variable zlo_mobile_STR index 6.7
+
+### --- in.segregation --- ###
+variable dt_S equal 0.001
+
+variable S_nx equal 3 # replication
+variable S_ny equal 3 # replication
+variable S_nz equal 1 # replication 
+
+variable thermo_step_S equal 500
+variable dump_step_S equal 500
+variable rnd_seed_S index 12345
+variable zlo_mobile_S equal 6.7
+variable md_steps equal 100
+variable mc_steps equal 10
+variable mu equal 1
+variable conc equal 1
+variable kappa equal 10
+
+### --- in.minimize_0K --- ###
+variable thermo_step_M equal 100
+variable dump_step_M equal 500

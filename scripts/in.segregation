@@ -122,5 +122,4 @@ fix sgcmc all sgcmc ${md_steps} 1 ${T} ${mu} variance ${kappa} $(v_conc/100)
 shell cd ../${gbpath}/${dat}
 write_data ${self}_Ni_${conc}_k_${kappa}.dat
 shell cd ../../../${home} 
-
 jump SELF main_loop
