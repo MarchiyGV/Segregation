@@ -67,7 +67,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 # Now allow the box to expand/contract perpendicular to the grain boundary
 thermo ${thermo_step_M}
 thermo_style custom step pe lx ly lz press pxx pyy pzz 
-fix 1 all box/relax x 0.0 y 0.0 couple xy vmax 0.01
+fix 1 all box/relax x 0.0 y 0.0 couple xy vmax 0.001
 min_style cg 
 minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
 
