@@ -3,15 +3,18 @@ from matplotlib import pyplot as plt
 import pandas as pd
 from pathlib import Path
 import numpy as np
-import argparse
+import argparse, os
 
 def main(args):
     name = args.name
     plot_ni = args.plot_ni
-
+    print(os.getcwd())
+    if (os.path.abspath(os.getcwd()).split('/'))[-1]=='scripts':
+        os.chdir('..')
+    print(os.getcwd())
     path = f'GB_projects/{name}/'
     impath = f"GB_projects/{name}/images/"
-    #Path(impath).mkdir(exist_ok=True)
+    Path(impath).mkdir(exist_ok=True)
     fig, axes = plt.subplots(1, len(args.file), dpi=100) # give plots a rectangular frame
     cmap = cm.viridis
 
