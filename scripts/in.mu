@@ -3,7 +3,7 @@ clear
 
 units metal
 atom_style atomic
-boundary p p s
+boundary p p m
 variable gbname index STGB_210 #should be selected by user
 variable structure_name_1 index slice.dat #should be selected by user
 variable structure_name_2 index slice.dat #should be selected by user
@@ -79,7 +79,7 @@ if "${type} == pure" then "set type 2 type 1"
 
 thermo ${thermo_step_M}
 thermo_style custom step pe lx ly lz press pxx pyy pzz 
-min_style cg 
+min_style cg
 minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
 
 variable file_tmp index ${self}_E.txt

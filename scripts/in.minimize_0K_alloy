@@ -13,7 +13,7 @@ variable path index GB_projects
 variable pot_path index potentials
 variable home index scripts
 variable thermo_output index thermo_output
-variable dump index dumps
+variable dump index dump
 variable dat index dat
 variable structure index ${path}/${gbname}/${dat}/${structure_name}
 variable gbpath index ${path}/${gbname}
@@ -55,24 +55,34 @@ shell cd ../${home}
 dump 1 all cfg ${dump_step_M} ../${dump_path}/dump_*.cfg mass type xs ys zs
 dump_modify 1 element Ag Ni
 
-
+print "$(count(all))"
 # ---------- Run Minimization --------------------- 
 #reset_timestep 0 
+change_box all boundary p p m 
+timestep 0.01
 thermo ${thermo_step_M}
-thermo_style custom step pe lx ly lz press pxx pyy pzz 
-min_style cg 
+thermo_style custom atoms step pe lx ly lz press pxx pyy pzz 
+min_style cg
+min_modify dmax 0.01
 minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
 
-# ---------- Run Minimization 2--------------------- 
-# Now allow the box to expand/contract perpendicular to the grain boundary
+# ---------- thermal expansion--------------------- 
+change_box all x final $(xlo) $(xlo+v_lx_0K_alloy) y final $(ylo) $(ylo+v_ly_0K_alloy) remap units box 
+write_dump all cfg ../${dump_path}/dump_*.cfg mass type xs ys zs modify element Ag Ni
+# ---------- Run Minimization --------------------- 
+#reset_timestep 0 
+print "$(count(all))"
+timestep 0.00000000001
 thermo ${thermo_step_M}
-thermo_style custom step pe lx ly lz press pxx pyy pzz 
-fix 1 all box/relax x 0.0 y 0.0 vmax 0.00001
-min_style cg 
+thermo_style custom atoms step pe lx ly lz press pxx pyy pzz 
+min_style cg
+min_modify dmax 0.001
 minimize ${etol} ${ftol} ${maxiter} ${maxeval} 
 
+print "$(count(all))"
 shell cd ../${gbpath}/${dat}
 write_data ${self}_${structure_name}
+#write_dump all cfg ${self}_${structure_name}.cfg mass type xs ys zs modify element Ag Ni
 shell cd ../../../${home}
 
 print "All done"

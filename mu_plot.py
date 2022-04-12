@@ -10,9 +10,8 @@ def main(args):
     plot_ni = args.plot_ni
 
     path = f'GB_projects/{name}/'
-    impath = f"GB_projects/{name}/images"
-    Path(impath).mkdir(exist_ok=True)
-    impath=impath+"/"
+    impath = f"GB_projects/{name}/images/"
+    #Path(impath).mkdir(exist_ok=True)
     fig, axes = plt.subplots(1, len(args.file), dpi=100) # give plots a rectangular frame
     cmap = cm.viridis
 
