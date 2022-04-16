@@ -44,7 +44,7 @@ variable dump_step_STR equal 500
 variable dt_S equal 0.001
 
 variable S_nx equal 1 # replication
-variable S_ny equal 2 # replication
+variable S_ny equal 1 # replication
 variable S_nz equal 1 # replication 
 
 variable thermo_step_S equal 500
@@ -60,3 +60,12 @@ variable kappa equal 10
 ### --- in.minimize_0K --- ###
 variable thermo_step_M equal 100
 variable dump_step_M equal 500
+
+variable lx_0K_i equal 9.30324990958494
+variable ly_0K_i equal 37.80167439716058
+
+variable lx_0K_alloy equal "v_lx_0K_i*v_nx*v_SR_nx*v_S_nx"
+variable ly_0K_alloy equal "v_ly_0K_i*v_ny*v_SR_ny*v_S_ny"
+
+variable lx_0K_pure equal "v_lx_0K_i*v_nx*v_SR_nx"
+variable ly_0K_pure equal "v_ly_0K_i*v_ny*v_SR_ny"

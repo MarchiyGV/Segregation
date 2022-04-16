@@ -4,7 +4,7 @@ E_p_1 = -24472.5535103112 #final
 E_wfc110_p_0 = -24782.3612555626 #final
 E_wfc110_p_1 = -24472.5256153101 #final
 
-E_wfc110_a_0 = -24807.8136389166
+E_wfc110_a_0 = -24807.8136411687 #final
 E_wfc110_a_1 = -24497.9705093705 #final
  
 E_k3_p_0 = -24782.3766633464 #final
@@ -74,10 +74,10 @@ md = np.array([MD_dmu1, MD_dmu2, MD_dmu3])
 d = 0.3
 w = 0.3
 plt.bar(x-d/2, dft, width=w, label='DFT')
-plt.bar(x+d/2, md, width=w, label='MD')
-plt.bar(x[0:1]-(d+w)/2, [DFT_dmu_wfc110_1], width=w/3, label="k2 110wfc")
-plt.bar(x[0:1]-(d+w-2*w/3)/2, [DFT_dmu_15vac_k2_1], width=w/3, label='k2')
-plt.bar(x[0:1]-(d+w-4*w/3)/2, [DFT_dmu_15vac_k3_1], width=w/3, label='k3')
+plt.bar(x+d/2, md, width=w, label='EAM')
+#plt.bar(x[0:1]-(d+w)/2, [DFT_dmu_wfc110_1], width=w/3, label="k2 110wfc")
+#plt.bar(x[0:1]-(d+w-2*w/3)/2, [DFT_dmu_15vac_k2_1], width=w/3, label='k2')
+#plt.bar(x[0:1]-(d+w-4*w/3)/2, [DFT_dmu_15vac_k3_1], width=w/3, label='k3')
 plt.xticks(x, x)
 plt.gca().set_aspect('auto')
 plt.xlabel('position')
