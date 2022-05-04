@@ -28,7 +28,7 @@ shell mkdir ../${gbpath}/${dat}
 variable thermo_step_BR equal 500
 variable dump_step_BR equal 500
 variable rnd_seed_BR index 12345
-include ../${gbpath}/input.txt #T, dt_TR, potnames, nx, ny, nz, thermal_relax_steps, [thermo_step_TR, dump_step_TR, rnd_seed_TR]
+include ../${gbpath}/input.txt 
 print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print "----------input----------"
@@ -48,6 +48,7 @@ timestep ${dt}
 
 # ATOMS DEFINITION
 read_data ../${structure}
+set type 2 type 1
 
 ######################################
 # DEFINE INTERATOMIC POTENTIAL
@@ -67,7 +68,7 @@ print "##dt = ${dt}" file ${file} screen no
 print "#time; temp; press; pe" append ${file} screen no
 fix out all print ${thermo_step_BR} "$(time); $(temp); $(press); $(pe)" append ${file} screen no
 dump 1 all cfg ${dump_step_BR} ../${dump_path}/dump_*.cfg mass type xs ys zs
-dump_modify 1 element Ag Ag
+dump_modify 1 element Ag
 ######################################
 # START
 velocity all create $(v_T*2) ${rnd_seed_BR} mom no rot no

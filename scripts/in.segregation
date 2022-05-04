@@ -59,7 +59,6 @@ timestep ${dt}
 
 # ATOMS DEFINITION
 read_data ../${structure}
-set type 2 type 1
 replicate ${S_nx} ${S_ny} ${S_nz}
 change_box all z final $(zlo) $(zhi+v_dz) units box
 print """

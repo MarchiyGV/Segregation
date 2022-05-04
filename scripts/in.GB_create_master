@@ -34,12 +34,12 @@ include ../${path}/${gbname}/input.txt #can overrite minimization_params.txt
 print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print "----------input----------"
-shell cat ../${path}/input.txt
+shell cat ../${path}/${gbname}/input.txt
 print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print " "
 
-variable potname index ${potname_pure}
+variable potname index ${potname_pure_gb}
 variable oriname index ../${path}/${gbname}/orientation.txt
 
 # Extra variables (added for ATGBs)
@@ -108,6 +108,7 @@ displace_atoms upper move ${tx} 0 ${tz} units lattice
 if "$d == 1" then "delete_atoms overlap ${overlapdist} lower upper" 
 if "$d == 2" then "delete_atoms overlap ${overlapdist} upper lower" 
 if "$c == 1" then "variable atomprev equal 1" 
+
 variable natoms equal "count(all)" 
 print "Previous: ${atomprev}, Present: ${natoms}" 
 if "${atomprev} == ${natoms}" then "jump in.GB_create_master loopend" 
@@ -118,6 +119,7 @@ include GB_minimize.txt
 shell mkdir ../${path}/${gbname}/${0K_structures} 
 shell cd ../${path}/${gbname}/${0K_structures} 
 write_data GB_E${gbernd}_N${natoms}_count${counter}.dat
+print "!GB_E${gbernd}_N${natoms}_count${counter}.dat"
 shell cd ../../../${home} 
  
 # ---------- End of loop structure ------------- 

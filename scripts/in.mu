@@ -42,7 +42,6 @@ shell mkdir ../${gbpath}/${dump}
 shell mkdir ../${dump_path}
 # ATOMS DEFINITION
 read_data ../${structure_1}
-if "${type} == pure" then "set type 2 type 1"
 ######################################
 # DEFINE INTERATOMIC POTENTIAL
 
@@ -74,8 +73,7 @@ unfix tmp
 shell rm ${file_tmp}
 
 delete_atoms group all compress yes
-read_data ../${structure_2} add append 
-if "${type} == pure" then "set type 2 type 1"
+read_data ../${structure_2} add append
 
 thermo ${thermo_step_M}
 thermo_style custom step pe lx ly lz press pxx pyy pzz 

@@ -14,7 +14,7 @@ def main(args):
     path = f'GB_projects/{name}/'
     impath = f"GB_projects/{name}/images/"
     Path(impath).mkdir(exist_ok=True)
-    fig, ax = plt.subplots(1, 1, dpi=100)
+    fig, ax = plt.subplots(1, 1, dpi=500)
     Ni=[2, 1, 0]
     for j, file in enumerate(args.file[::-1]):
         fpath = f'GB_projects/{name}/output/{file}'

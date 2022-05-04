@@ -9,5 +9,5 @@
 ### --- common stats --- ###
 
 variable potname index GB_potential_Ag_single.txt
-variable type index pure
+variable type index pure_s
 

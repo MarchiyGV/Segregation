@@ -53,7 +53,7 @@ shell cd ../${home}
 # DEFINE THERMO AND OUTPUT
 
 dump 1 all cfg ${dump_step_M} ../${dump_path}/dump_*.cfg mass type xs ys zs
-dump_modify 1 element Ag Ag
+dump_modify 1 element Ag
 
 
 print "$(count(all))"
@@ -69,7 +69,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 
 # ---------- thermal expansion--------------------- 
 change_box all x final $(xlo) $(xlo+v_lx_0K_pure) y final $(ylo) $(ylo+v_ly_0K_pure) remap units box 
-write_dump all cfg ../${dump_path}/dump_*.cfg mass type xs ys zs modify element Ag Ag
+write_dump all cfg ../${dump_path}/dump_*.cfg mass type xs ys zs modify element Ag
 # ---------- Run Minimization --------------------- 
 #reset_timestep 0 
 print "$(count(all))"

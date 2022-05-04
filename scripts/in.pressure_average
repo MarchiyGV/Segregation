@@ -67,7 +67,7 @@ print "##dt = ${dt}" file ${file} screen no
 print "#time; temp; press; pe" append ${file} screen no
 fix out all print ${thermo_step_BR} "$(time); $(temp); $(press); $(pe)" append ${file} screen no
 dump 1 all cfg ${dump_step_BR} ../${dump_path}/dump_*.cfg mass type xs ys zs
-dump_modify 1 element Ag Ag
+dump_modify 1 element Ag
 ######################################
 # START
 velocity all create $(v_T*2) ${rnd_seed_BR} mom no rot no
