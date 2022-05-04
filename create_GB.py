@@ -1,7 +1,7 @@
 from pathlib import Path
 import argparse, os
 from subprocess import Popen, PIPE
-import time, re
+import time, re, shutil
 import numpy as np
 
 def main(args):
@@ -60,8 +60,29 @@ def main(args):
         print(files[ind])
         if args.ovito:
             os.popen(f'ovito ../GB_projects/{name}/0K_structures/{files[ind]}')
+        while True:
+            ans = input(f'Do you want to select this for futher steps? [y/n/<other_filename>]:').replace('\n', '')
+            if ans=='y' or ans=='Y':
+                file = files[ind]
+                break
+            elif ans=='n' or ans=='N':
+                file = False
+                break
+            else:
+                fpath = f'../GB_projects/{name}/0K_structures/{ans}'       
+                if os.path.isfile(fpath):
+                    file = ans
+                else:
+                    print('Pleas answer [Yy/Nn/<other_filename>]')
     else:
         print('\n!!!!!!!!!!!!!!!!!\n\nError occured in LAMMPS')
+
+    if file:
+        file = file.replace("\n", "")
+        fpath = f'../GB_projects/{name}/0K_structures/{file}'  
+        dest = f'../GB_projects/{name}/dat'
+        Path(dest).mkdir(exist_ok=True)  
+        shutil.copyfile(fpath, f'{dest}/initial.dat')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
