@@ -36,7 +36,7 @@ fi
 
 echo; echo "LAMMPS task done, plotting..."; echo
 
-python plot_surface_thermal_relax.py $name $mean_width
+python plot_surface_thermal_relax.py --name $name -m $mean_width --inp surface_thermal_relax
 
 cd ..
 echo; echo "All done"; echo

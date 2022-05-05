@@ -2,37 +2,49 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 import sys
-name = sys.argv[1]
-n = int(sys.argv[2])
-file = f"../GB_projects/{name}/thermo_output/surface_thermal_relax.txt"
-print(file)
-df = pd.read_csv(file, sep=';', comment='#', names=['t', 'T', 'pe'])
-t = df['t']
-pe = df['pe']
-T = df['T']
+import argparse
 
-def rolling_mean(numbers_series, window_size):
-    windows = numbers_series.rolling(window_size)
-    moving_averages = windows.mean()
-    moving_averages_list = moving_averages.tolist()
-    final_list = moving_averages_list[window_size - 1:]
-    return final_list
+def main(args):
+    name = args.name
+    n = args.n
+    inp = args.inp
+    file = f"../GB_projects/{name}/thermo_output/{inp}.txt"
+    print(file)
+    df = pd.read_csv(file, sep=';', comment='#', names=['t','T', 'pe'])
+    t = df['t']
+    pe = df['pe']
+    T = df['T']
 
-pe1 = rolling_mean(pe, n)
-t1 = t[len(pe)-len(pe1):]
-t = np.array(t)
+    def rolling_mean(numbers_series, window_size):
+        windows = numbers_series.rolling(window_size)
+        moving_averages = windows.mean()
+        moving_averages_list = moving_averages.tolist()
+        final_list = moving_averages_list[window_size - 1:]
+        return final_list
 
-f, (ax1, ax3) = plt.subplots(1, 2)
+    pe1 = rolling_mean(pe, n)
+    t1 = t[len(pe)-len(pe1):]
+    t = np.array(t)
 
-ax1.plot(t, pe)
-ax1.set_xlabel('$t, ps$')
-ax1.set_ylabel('$E_{pot}, eV$')
+    f, (ax1, ax3) = plt.subplots(2, 2)
 
-ax3.plot(t1, pe1)
-ax3.set_xlabel('$t, ps$')
-ax3.set_ylabel('$<E_{pot}>_{roll}, eV$')
-ax3.set_title(f'rolling mean over {n}')
-f.suptitle(f'Surface thermal relax {name} {round(t[-1])}ps')
-f.tight_layout()
-plt.savefig(f'../GB_projects/{name}/images/plot.surface_thermal_relax_time{round(t[-1])}.png')
-plt.show()
+    ax1.plot(t, pe)
+    ax1.set_xlabel('$t, ps$')
+    ax1.set_ylabel('$E_{pot}, eV$')
+
+    ax3.plot(t1, pe1)
+    ax3.set_xlabel('$t, ps$')
+    ax3.set_ylabel('$<E_{pot}>_{roll}, eV$')
+    ax3.set_title(f'rolling mean over {n}')
+    f.suptitle(f"{inp.replace('_', ' ')} {name} {round(t[-1])}ps")
+    f.tight_layout()
+    plt.savefig(f'../GB_projects/{name}/images/plot.{inp}_time{round(t[-1])}.png')
+    plt.show()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--name", required=True, help='for example STGB_210')
+    parser.add_argument("-n", required=True, type=int)
+    parser.add_argument("--inp", required=True)
+    args = parser.parse_args()
+    main(args)

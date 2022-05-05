@@ -40,6 +40,6 @@ fi
 echo; echo "LAMMPS task done, plotting..."; echo
 
 mkdir ../GB_projects/$name/images
-python plot_thermal_relax.py $name $mean_width berendsen_relax
+python plot_thermal_relax.py --name $name -m $mean_width --inp berendsen_relax
 cd ..
 echo; echo "All done"; echo

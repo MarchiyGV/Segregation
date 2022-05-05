@@ -38,7 +38,7 @@ print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print " "
 variable dt equal ${dt_STR}
-variable potname index ${potname_pure}
+variable potname index ${potname_alloy}
 
 variable dump_path index ${gbpath}/${dump}/${self}
 shell mkdir ../${gbpath}/${dump}
@@ -49,7 +49,7 @@ timestep ${dt}
 # ATOMS DEFINITION
 read_data ../${structure} 
 replicate ${SR_nx} ${SR_ny} ${SR_nz}
-region vac block EDGE EDGE EDGE EDGE $((zlo+zhi)/2) EDGE
+region vac block EDGE EDGE EDGE EDGE $((zlo+zhi)/2+v_dz_surf) EDGE
 delete_atoms region vac compress yes
 region mobile block EDGE EDGE EDGE EDGE ${zlo_mobile_STR} EDGE
 group mobile region mobile
@@ -71,12 +71,14 @@ print "##dt = ${dt}" file ${file} screen no
 print "#time; temp; pe;" append ${file} screen no
 fix out all print ${thermo_step_STR} "$(time); $(temp); $(pe)" append ${file} screen no
 dump 1 all cfg ${dump_step_STR} ../${dump_path}/dump_*.cfg mass type xs ys zs c_peratom
-dump_modify 1 element Ag Ag
+dump_modify 1 element Ag Ni
+print "dumpfile ../${dump_path}/dump_0.cfg"
 fix NVT mobile nvt temp ${T} ${T} $(100*dt) 
 run ${surface_relax_steps}
 
 shell cd ../${gbpath}/${dat}
-write_data surface_thermal_relaxed_T${T}_steps${surface_relax_steps}.dat
+write_data ${self}_T${T}_steps${surface_relax_steps}.dat
+print "datfile ${self}_T${T}_steps${surface_relax_steps}.dat"
 shell cd ../../${home}/${dat} 
 
 print "All done"

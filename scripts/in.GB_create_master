@@ -39,7 +39,7 @@ print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print " "
 
-variable potname index ${potname_pure_gb}
+variable potname index ${potname_pure}
 variable oriname index ../${path}/${gbname}/orientation.txt
 
 # Extra variables (added for ATGBs)

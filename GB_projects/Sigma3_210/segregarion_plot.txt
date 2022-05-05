@@ -1,0 +1,5 @@
+slope width 15000
+step 1000
+rolling mean width 500
+offset 0
+converged slope 0.001

@@ -90,12 +90,13 @@ thermo_style custom step time temp pe v_conc_avg v_mu
 thermo ${thermo_step_S}
 shell mkdir ../${gbpath}/${thermo_output}
 variable file index ../${gbpath}/${thermo_output}/${self}_Ni_${conc}_k_${kappa}.txt
+print "thermo output file: ${file}"
 print "##dt = ${dt}" file ${file} screen no
 print "#time; temp; pe; conc" append ${file} screen no
 fix out all print ${thermo_step_S} "$(time); $(temp); $(pe); $(f_sgcmc[3])" append ${file} screen no
 dump 1 all cfg ${dump_step_S} ../${dump_path}/dump_Ni_${conc}_k_${kappa}_*.cfg mass type xs ys zs c_peratom
 dump_modify 1 element Ag Ni
-
+print "dumpfile ../${dump_path}/dump_Ni_${conc}_k_${kappa}_0.cfg"
 
 ######################################
 # START
@@ -109,6 +110,7 @@ VCSGCMC
 """
 label main_loop
 run $(v_md_steps*v_mc_steps)
+print "vcsgc_loop"
 print "mu = ${mu}"
 variable mut equal ${mu}
 variable mu delete
@@ -120,5 +122,6 @@ fix sgcmc all sgcmc ${md_steps} 1 ${T} ${mu} variance ${kappa} $(v_conc/100)
 
 shell cd ../${gbpath}/${dat}
 write_data ${self}_Ni_${conc}_k_${kappa}.dat
+print "datfile ${self}_Ni_${conc}_k_${kappa}.dat"
 shell cd ../../../${home} 
 jump SELF main_loop
