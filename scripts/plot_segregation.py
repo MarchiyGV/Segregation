@@ -30,11 +30,6 @@ def main(args):
     pe_ = df['pe']
     c_ = (1-df['conc'])*100
     t, pe, c = [t_[0]], [pe_[0]], [c_[0]]
-    if s1>=len(t):
-        print(f'Error: offset {s1} is too big for sequence of lenght {len(t)}!')
-        s1 = 0
-        print('offset was set to 0')
-    s = slice(s1,-1)
     for i in range(1,len(t_)):
         if t_[i]==t_[i-1]:
             pass
@@ -45,6 +40,11 @@ def main(args):
     t = np.array(t)
     pe = np.array(pe)
     c = np.array(c)
+    if s1>=len(t):
+        print(f'Error: offset {s1} is too big for sequence of lenght {len(t)}!')
+        s1 = 0
+        print('offset was set to 0')
+    s = slice(s1,-1)
 
     pe1 = rolling_mean(pe[s], n)
     c1 = rolling_mean(c[s], n)
@@ -57,8 +57,8 @@ def main(args):
     
     def slope(x1, w):
         s = slice(x1,x1+w)
-        y = pe1
-        x = step1
+        y = pe1[s]
+        x = step1[s]
         res = stats.linregress(x, y)
         return res.slope*md_steps
     res=[]

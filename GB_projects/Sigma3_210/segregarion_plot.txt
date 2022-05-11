@@ -1,4 +1,4 @@
-slope width 15000
+slope width 2000
 step 1000
 rolling mean width 500
 offset 25
