@@ -1,9 +1,12 @@
 from pathlib import Path
 import argparse, os
 from subprocess import Popen, PIPE
-import time, re, shutil
+import time, re, shutil, sys
 import numpy as np
-from scripts.plot_segregation import main as plot
+
+sys.path.insert(1, './scripts')
+
+from plot_segregation import main as plot
 
 def main(args):
     lmp = 'lmp_omp_edited'
