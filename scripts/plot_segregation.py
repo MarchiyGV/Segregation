@@ -30,6 +30,10 @@ def main(args):
     pe_ = df['pe']
     c_ = (1-df['conc'])*100
     t, pe, c = [t_[0]], [pe_[0]], [c_[0]]
+    if s1>=len(t):
+        print(f'Error: offset {s1} is too big for sequence of lenght {len(t)}!')
+        s1 = 0
+        print('offset was set to 0')
     s = slice(s1,-1)
     for i in range(1,len(t_)):
         if t_[i]==t_[i-1]:
