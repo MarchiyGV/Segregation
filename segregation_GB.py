@@ -3,7 +3,7 @@ import argparse, os
 from subprocess import Popen, PIPE
 import time, re, shutil
 import numpy as np
-
+from scripts.plot_segregation import main as plot
 
 def main(args):
     lmp = 'lmp_omp_edited'
@@ -106,7 +106,6 @@ def main(args):
                 plot_args.name = args.name
                 plot_args.src = src
                 plot_args.hide = (not args.plot)
-                from scripts.plot_segregation import main as plot
                 slope = np.array(plot(plot_args))
                 N_conv = np.sum(np.abs(slope)<slope_conv)
                 print('convergence criteria achieved in', N_conv, 'points')
