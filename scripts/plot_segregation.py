@@ -86,7 +86,9 @@ def main(args):
     ax3.set_ylabel('$\partial_t<E_{pot}>_{roll}, eV/step$')
     ax3.plot(res, 'o')
     ax1.set_xlim((0, len(t)))
-    ax1.set_xticks(list(ax1.get_xticks()) + [s1, len(t)], list(ax1.get_xticks()) + [s1, len(t)], rotation='vertical')
+    ticks = list(ax1.get_xticks()) + [s1, len(t)]
+    ax1.set_xticks(ticks)
+    ax1.set_xticklabels(ticks, rotation='vertical')
     f.suptitle(args.name)
     f.tight_layout()
     ax2.text(0.99, 0.99, f'rolling mean over {n}', horizontalalignment='right', verticalalignment='top', transform=ax1.transAxes, zorder=10)
