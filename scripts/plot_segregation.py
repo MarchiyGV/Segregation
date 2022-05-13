@@ -51,9 +51,10 @@ def main(args):
     step1 = np.arange(len(pe1))
 
     f, (ax1, ax3) = plt.subplots(1, 2, figsize=(10,5))
-    ax1.plot(pe1)
+    
     ax2 = ax1.twinx()
     ax2.plot(c1, color=color_red)
+    ax1.plot(pe1)
     
     def slope(x1, w):
         s = slice(x1,x1+w)
