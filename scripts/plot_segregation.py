@@ -7,6 +7,12 @@ from scipy import stats
 def rolling_mean(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
+def pretty_round(num):
+    working = str(num-int(num))
+    for i, e in enumerate(working[2:]):
+        if e != '0':
+            return int(num) + float(working[:i+3])
+
 def main(args):
     w = args.w
     st = args.st
@@ -46,6 +52,9 @@ def main(args):
         print('offset was set to 0')
     s = slice(s1,-1)
 
+    sigma_c = c[s].var()**0.5
+    sigma_pe = pe[s].var()**0.5
+
     pe1 = rolling_mean(pe[s], n)
     c1 = rolling_mean(c[s], n)
     step1 = np.arange(len(pe1))
@@ -53,8 +62,8 @@ def main(args):
     f, (ax1, ax3) = plt.subplots(1, 2, figsize=(10,5))
     
     ax2 = ax1.twinx()
-    ax2.plot(c1, color=color_red)
-    ax1.plot(pe1)
+    ax1.plot(step1+s1, c1, color=color_red, zorder=0)
+    ax2.plot(step1+s1, pe1, zorder=5)
     
     def slope(x1, w):
         s = slice(x1,x1+w)
@@ -76,9 +85,13 @@ def main(args):
     ax3.set_xlabel(f'$step\cdot {st}$')
     ax3.set_ylabel('$\partial_t<E_{pot}>_{roll}, eV/step$')
     ax3.plot(res, 'o')
+    ax1.set_xlim((0, len(t)))
+    ax1.set_xticks(list(ax1.get_xticks()) + [s1, len(t)], list(ax1.get_xticks()) + [s1, len(t)], rotation='vertical')
     f.suptitle(args.name)
     f.tight_layout()
-    ax1.text(0.1, 0.95, f'rolling mean over {n}', transform=ax1.transAxes)
+    ax2.text(0.99, 0.99, f'rolling mean over {n}', horizontalalignment='right', verticalalignment='top', transform=ax1.transAxes, zorder=10)
+    ax2.text(0.99, 0.94, f'$\sigma_c = {pretty_round(sigma_c)} \\%$', horizontalalignment='right', verticalalignment='top', transform=ax1.transAxes, zorder=10)
+    ax2.text(0.99, 0.89, f'$\sigma_U = {pretty_round(sigma_pe)} eV$', horizontalalignment='right', verticalalignment='top', transform=ax1.transAxes, zorder=10)
     ax3.text(0.5, 0.02, f'dx = {w}', transform=ax3.transAxes)
     plt.savefig(f"../GB_projects/{args.name}/images/{(args.src).replace('.txt', '.png')}")
     if not args.hide:
