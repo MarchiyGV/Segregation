@@ -119,8 +119,9 @@ def main(args):
                 if _N_conv_tot > N_conv_tot:
                     N_conv += (_N_conv_tot-N_conv_tot)
                 N_conv_tot = _N_conv_tot
-                if slope[-1]>slope_conv:
-                    N_conv = 0
+                if len(slope)>0:
+                    if slope[-1]>slope_conv:
+                        N_conv = 0
                     
                 print('convergence criteria achieved in', N_conv, 'points')
 
