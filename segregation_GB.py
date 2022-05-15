@@ -15,6 +15,7 @@ def main(args):
     name = args.name
     structure = args.structure
     N_loops = args.loops
+    
     if not structure:
         fname = f'GB_projects/{name}/conf.txt'
         flag=False
@@ -49,8 +50,10 @@ def main(args):
 
     print(task)
 
-    exitflag = False
     counter = 0
+    N_conv = 0
+    file_count = 0
+    N_conv_tot = 0
     last_counter = 0
     with Popen(task.split(), stdout=PIPE, bufsize=1, universal_newlines=True) as p:
         time.sleep(0.1)
@@ -59,8 +62,6 @@ def main(args):
             if 'thermo output file:' in line:
                 src_path = line.split()[-1]
                 src = src_path.split('/')[-1]
-            if "All done" in  line:
-                exitflag = True
             elif "dumpfile" in line:
                 dumpfile = (line.replace('dumpfile ', '')).replace('\n', '')
             elif "datfile" in line:
@@ -85,6 +86,7 @@ def main(args):
                 flag3=False
                 flag4=False
                 flag5=False
+                flag6=False
                 with open(fname, 'r') as f :
                     for line in f:
                         if 'slope width' in line:
@@ -102,7 +104,10 @@ def main(args):
                         if 'converged slope' in line:
                             slope_conv = float(line.split()[-1])
                             flag5=True
-                flag = (flag1 and flag2 and flag3 and flag4 and flag5)
+                        if 'number of points for convergence' in line:
+                            N_conv_criteria = int(line.split()[-1])
+                            flag6=True
+                flag = (flag1 and flag2 and flag3 and flag4 and flag5 and flag6)
                 if not flag:
                     raise ValueError(f'incorrect segregarion_plot.txt')
                 
@@ -110,35 +115,26 @@ def main(args):
                 plot_args.src = src
                 plot_args.hide = (not args.plot)
                 slope = np.array(plot(plot_args))
-                N_conv = np.sum(np.abs(slope)<slope_conv)
+                _N_conv_tot = np.sum(np.abs(slope)<=slope_conv)
+                if _N_conv_tot > N_conv_tot:
+                    N_conv += (_N_conv_tot-N_conv_tot)
+                N_conv_tot = _N_conv_tot
+                if slope[-1]>slope_conv:
+                    N_conv = 0
+                    
                 print('convergence criteria achieved in', N_conv, 'points')
 
+                if N_conv > N_conv_criteria:
+                    print(f'saving state for sampling: {file_count}')
+                    file = datfile.replace("\n", "")
+                    outfile = file.replace('.dat') + f'_n{file_count}.dat'
+                    fpath = f'../GB_projects/{name}/dat/{file}'  
+                    dest = f'../GB_projects/{name}/samples'
+                    Path(dest).mkdir(exist_ok=True)  
+                    shutil.copyfile(fpath, f'{dest}/{outfile}')
+                    file_count+=1
+                
 
-    
-    if exitflag:
-        print("LAMMPS finish succesfully")
-        if args.ovito:
-            os.popen(f'ovito {dumpfile}')
-    else:
-        print('\n!!!!!!!!!!!!!!!!!\n\nError occured in LAMMPS')
-        raise ValueError('Error in LAMMPS, check input script and log file')
-
-    fname = f'../GB_projects/{name}/conf.txt'
-    output = ''
-    flag=False
-    with open(fname, 'r') as f :
-        for line in f:
-            if 'STR' in line:
-                line = f'STR {datfile}\n'
-                flag=True
-                print(line)
-
-            output += line
-    if not flag:
-        output += f'STR {datfile}\n'
-
-    with open(fname, 'w') as f:
-        f.write(output)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
