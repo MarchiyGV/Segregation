@@ -54,6 +54,7 @@ shell cd ../${home}
 
 dump 1 all cfg ${dump_step_M} ../${dump_path}/dump_*.cfg mass type xs ys zs
 dump_modify 1 element Ag Ni
+print "dumpfile ../${dump_path}/dump_0.cfg"
 
 print "$(count(all))"
 # ---------- Run Minimization --------------------- 
@@ -82,6 +83,7 @@ minimize ${etol} ${ftol} ${maxiter} ${maxeval}
 print "$(count(all))"
 shell cd ../${gbpath}/${dat}
 write_data ${self}_${structure_name}
+print "datfile ${self}_${structure_name}"
 #write_dump all cfg ${self}_${structure_name}.cfg mass type xs ys zs modify element Ag Ni
 shell cd ../../../${home}
 

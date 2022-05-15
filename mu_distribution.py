@@ -38,8 +38,5 @@ if __name__ == '__main__':
     parser.add_argument("-n", "--name", required=True, help='for example STGB_210')
     parser.add_argument("-s", "--structure", required=True, dest='file', metavar='OUTPUT', nargs='+',
                         help='output of mu.py, for example "mu_minimize_0K_STGB_210_Ni_2_k_20.dat"')
-    try:
-        args = parser.parse_args()
-    except:
-        args = parser.parse_args('-n STGB_210 -s mu_minimize_0K_pure.dat mu_minimize_0K_STGB_210_Ni_1_k_100.dat mu_minimize_0K_STGB_210_Ni_2_k_20.dat'.split())
+    args = parser.parse_args()
     main(args)
