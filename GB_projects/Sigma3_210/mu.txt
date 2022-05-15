@@ -1,0 +1,2 @@
+variable potname index GB_potential_AgNi.txt
+variable type index alloy
