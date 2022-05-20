@@ -42,8 +42,8 @@ def main(args):
                         files.append(line.replace('!', ''))
                         ans = list(map(int, re.findall(r'\d+', line)))
                         print('{:12d} {:12d} {:12d}'.format(*ans))
-                        E.append(ans[0])
-                        N.append(ans[1])
+                        E.append(int(ans[0]))
+                        N.append(int(ans[1]))
                     else:
                         print(line.replace('!', ''), end='')
             else:
@@ -54,6 +54,8 @@ def main(args):
         print("LAMMPS finish succesfully")
         E = np.array(E)
         N = np.array(N)
+        print('E', E)
+        print('N', N)
         inds = np.where(E == E.min())
         ind = (np.where(N == np.max(N[inds])))[0][0]
         print(f"\nMinimum energy {E[ind]} with maximum atoms {N[ind]} at:")

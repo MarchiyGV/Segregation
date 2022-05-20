@@ -10,6 +10,17 @@ def main(args):
     job = args.job
     name = args.name
     structure = args.structure
+    if not structure:
+        fname = f'GB_projects/{name}/conf.txt'
+        flag=False
+        with open(fname, 'r') as f :
+            for line in f:
+                if 'init' in line:
+                    structure = line.split()[-1]
+                    print(structure)
+                    flag = True
+        if not flag:
+            raise ValueError(f'cannot find structure in conf.txt')
 
     print(name, '\n')
 
@@ -82,7 +93,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--name", required=True, help='for example STGB_210')
-    parser.add_argument("-s", "--structure", required=False, default='initial.dat')
+    parser.add_argument("-s", "--structure", required=False, default=None)
     parser.add_argument("-v", "--verbose", required=False, default=False, action='store_true',
                         help='show LAMMPS outpt')
     parser.add_argument("-j", "--job", required=False, default=1)

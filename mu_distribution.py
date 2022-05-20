@@ -4,6 +4,8 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 import argparse, os
+import glob
+
 
 def main(args):
     name = args.name
@@ -15,18 +17,28 @@ def main(args):
     impath = f"GB_projects/{name}/images/"
     Path(impath).mkdir(exist_ok=True)
     fig, ax = plt.subplots(1, 1, dpi=500)
-    Ni=[2, 1, 0]
-    for j, file in enumerate(args.file[::-1]):
-        fpath = f'GB_projects/{name}/output/{file}'
+    
+    files = []
+    for e in args.file:
+        files += glob.glob(f'GB_projects/{name}/output/{e}')
+
+    mu_avg = []
+
+    for j, fpath in enumerate(files):
         df = pd.read_csv(fpath, sep=' ', comment='#', names=['id', 'mu', 'x', 'y'])
         mu = np.array(df['mu'])
-        #n, bins = np.histogram(mu, 25)    
-        #ax.plot(bins[:-1], n
-        
-        n, bins, h = ax.hist(mu, 25, alpha = 0.7, label=f'{Ni[j]}% Ni', density=True)   
-        ax.axvline(mu.max(), linestyle='--', color=h[0]._original_facecolor)
-        ax.text(mu.max(), 10+j, round(mu.max(), 2), fontsize=7)
+        mu_avg += list(mu)
+        if args.avg:
+            pass
+            #ax.axvline(mu.max(), linestyle='--')
+        else:
+            n, bins, h = ax.hist(mu, 25, alpha = 0.7, density=True, label=fpath.split('_')[-1])   
+            ax.axvline(mu.max(), linestyle='--', color=h[0]._original_facecolor)
+        #ax.text(mu.max(), 10+j, round(mu.max(), 2), fontsize=7)
     
+    if args.avg:
+        ax.hist(mu_avg, 250, density=True)
+    plt.xlim((np.min(mu_avg), np.max(mu_avg)))
     plt.xlabel('$\mu, eV$')
     plt.ylabel('density')
     plt.legend()
@@ -38,5 +50,6 @@ if __name__ == '__main__':
     parser.add_argument("-n", "--name", required=True, help='for example STGB_210')
     parser.add_argument("-s", "--structure", required=True, dest='file', metavar='OUTPUT', nargs='+',
                         help='output of mu.py, for example "mu_minimize_0K_STGB_210_Ni_2_k_20.dat"')
+    parser.add_argument("--avg", required=False, help='plot average distribution', action='store_true', default=False)                  
     args = parser.parse_args()
     main(args)
