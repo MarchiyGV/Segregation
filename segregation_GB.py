@@ -55,6 +55,7 @@ def main(args):
     file_count = 0
     N_conv_tot = 0
     last_counter = 0
+    datfile = ''
     with Popen(task.split(), stdout=PIPE, bufsize=1, universal_newlines=True) as p:
         time.sleep(0.1)
         print('\n')
@@ -126,18 +127,21 @@ def main(args):
                     
                 print('convergence criteria achieved in', N_conv, 'points')
 
-                if N_conv > N_conv_criteria:
-                    print(f'saving state for sampling: {file_count+1}')
-                    file = datfile.replace("\n", "")
-                    outfile = file.replace('.dat') + f'_n{file_count}.dat'
-                    fpath = f'../GB_projects/{name}/dat/{file}'  
-                    dest = f'../GB_projects/{name}/samples'
-                    Path(dest).mkdir(exist_ok=True)  
-                    shutil.copyfile(fpath, f'{dest}/{outfile}')
-                    file_count+=1
-                    if file_count >= args.samples:
-                        p.kill()
-                        print('All done!')
+                if N_conv >= N_conv_criteria:
+                    if datfile == '':
+                        print('Error: unrecognized datfile')
+                    else:
+                        print(f'saving state for sampling: {file_count+1}')
+                        file = datfile.replace("\n", "")
+                        outfile = file.replace('.dat', '') + f'_n{file_count}.dat'
+                        fpath = f'../GB_projects/{name}/dat/{file}'  
+                        dest = f'../GB_projects/{name}/samples'
+                        Path(dest).mkdir(exist_ok=True)  
+                        shutil.copyfile(fpath, f'{dest}/{outfile}')
+                        file_count+=1
+                        if file_count >= args.samples:
+                            p.kill()
+                            print('All done!')
                 
 
 
