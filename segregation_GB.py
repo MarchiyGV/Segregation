@@ -28,7 +28,7 @@ def main(args):
         if not flag:
             raise ValueError(f'cannot find structure in conf.txt')
     if args.mu:
-        mu_arg = f'-var mu0 {args.mu}'
+        mu_arg = f'-var mu0 {args.mu} '
     else:
         mu_arg = ''
 
@@ -128,7 +128,7 @@ def main(args):
                 if N_conv > N_conv_criteria:
                     print(f'saving state for sampling: {file_count}')
                     file = datfile.replace("\n", "")
-                    outfile = file.replace('.dat') + f'_n{file_count}.dat'
+                    outfile = file.replace('.dat', '') + f'_n{file_count}.dat'
                     fpath = f'../GB_projects/{name}/dat/{file}'  
                     dest = f'../GB_projects/{name}/samples'
                     Path(dest).mkdir(exist_ok=True)  

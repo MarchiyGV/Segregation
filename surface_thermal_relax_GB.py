@@ -62,7 +62,7 @@ def main(args):
         if args.plot:
             impath = f'../GB_projects/{name}/images'
             Path(impath).mkdir(exist_ok=True)  
-            from scripts.plot_thermal_relax import main as plot
+            from scripts.plot_surface_thermal_relax import main as plot
             plot_args = parser.parse_args()
             plot_args.n = args.mean_width
             plot_args.inp = 'thermal_relax'
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     parser.add_argument("-n", "--name", required=True, help='for example STGB_210')
     parser.add_argument("-s", "--structure", required=False, default=False)
     parser.add_argument("-v", "--verbose", required=False, default=False, action='store_true',
-                        help='show LAMMPS outpt')
+                        help='show LAMMPS output')
     parser.add_argument("-j", "--job", required=False, default=1)
     parser.add_argument("-m", "--mean-width", dest='mean_width', required=False, default=50)
     parser.add_argument("-p", "--plot", required=False, default=False, action='store_true',
