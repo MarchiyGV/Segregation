@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 import argparse, os
-import glob
+import glob, re
 
 
 def main(args):
@@ -19,25 +19,30 @@ def main(args):
     fig, ax = plt.subplots(1, 1, dpi=500)
     
     files = []
+    mus = []
     for e in args.file:
-        files += glob.glob(f'GB_projects/{name}/output/{e}')
-
-    mu_avg = []
-
-    for j, fpath in enumerate(files):
-        df = pd.read_csv(fpath, sep=' ', comment='#', names=['id', 'mu', 'x', 'y'])
-        mu = np.array(df['mu'])
-        mu_avg += list(mu)
-        if args.avg:
-            pass
-            #ax.axvline(mu.max(), linestyle='--')
-        else:
-            n, bins, h = ax.hist(mu, 25, alpha = 0.7, density=True, label=fpath.split('_')[-1])   
-            ax.axvline(mu.max(), linestyle='--', color=h[0]._original_facecolor)
-        #ax.text(mu.max(), 10+j, round(mu.max(), 2), fontsize=7)
+        files.append(glob.glob(f'GB_projects/{name}/output/{e}'))
     
-    if args.avg:
-        ax.hist(mu_avg, 250, density=True)
+    conc = []
+
+    for j, file in enumerate(files):
+        mu_avg = []
+        fname = file[0].split('/')[-1]
+        conc.append(float(re.findall(r'\d+\.*\d*', fname)[1]))
+        for fpath in file:
+            df = pd.read_csv(fpath, sep=' ', comment='#', names=['id', 'mu', 'x', 'y'])
+            mu = np.array(df['mu'])
+            mu_avg += list(mu)
+            if args.avg:
+                pass
+                #ax.axvline(mu.max(), linestyle='--')
+            else:
+                n, bins, h = ax.hist(mu, 25, alpha = 0.7, density=True, label=fpath.split('_')[-1])   
+                ax.axvline(mu.max(), linestyle='--', color=h[0]._original_facecolor)
+            #ax.text(mu.max(), 10+j, round(mu.max(), 2), fontsize=7)
+    
+        if args.avg:
+            ax.hist(mu_avg, 250, density=True, label=f'$ c = {conc[-1]}$', alpha=0.7)
     plt.xlim((np.min(mu_avg), np.max(mu_avg)))
     plt.xlabel('$\mu, eV$')
     plt.ylabel('density')

@@ -55,6 +55,7 @@ def main(args):
     file_count = 0
     N_conv_tot = 0
     last_counter = 0
+    datfile = ''
     with Popen(task.split(), stdout=PIPE, bufsize=1, universal_newlines=True) as p:
         time.sleep(0.1)
         print('\n')
@@ -114,6 +115,7 @@ def main(args):
                 plot_args.name = args.name
                 plot_args.src = src
                 plot_args.hide = (not args.plot)
+                plot_args.slope_conv = slope_conv
                 slope = np.array(plot(plot_args))
                 _N_conv_tot = np.sum(np.abs(slope)<=slope_conv)
                 if _N_conv_tot > N_conv_tot:
@@ -125,6 +127,7 @@ def main(args):
                     
                 print('convergence criteria achieved in', N_conv, 'points')
 
+<<<<<<< HEAD
                 if N_conv > N_conv_criteria:
                     print(f'saving state for sampling: {file_count}')
                     file = datfile.replace("\n", "")
@@ -134,6 +137,23 @@ def main(args):
                     Path(dest).mkdir(exist_ok=True)  
                     shutil.copyfile(fpath, f'{dest}/{outfile}')
                     file_count+=1
+=======
+                if N_conv >= N_conv_criteria:
+                    if datfile == '':
+                        print('Error: unrecognized datfile')
+                    else:
+                        print(f'saving state for sampling: {file_count+1}')
+                        file = datfile.replace("\n", "")
+                        outfile = file.replace('.dat', '') + f'_n{file_count}.dat'
+                        fpath = f'../GB_projects/{name}/dat/{file}'  
+                        dest = f'../GB_projects/{name}/samples'
+                        Path(dest).mkdir(exist_ok=True)  
+                        shutil.copyfile(fpath, f'{dest}/{outfile}')
+                        file_count+=1
+                        if file_count >= args.samples:
+                            p.kill()
+                            print('All done!')
+>>>>>>> 001185a698d7edadf255829822c0e8ff61dbe8b4
                 
 
 
@@ -152,6 +172,7 @@ if __name__ == '__main__':
                         help='show the thermodynamic plot')
     parser.add_argument("--loops", required=False, default=100, type=int,
                         help='draw the thermodynamic plot each <N> loops')
+    parser.add_argument("--samples", required=False, default=100, type=int, help='how many samples to save')
     parser.add_argument("--ovito", required=False, default=False, action='store_true',
                         help='open the dump in ovito')
     args = parser.parse_args()

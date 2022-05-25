@@ -75,7 +75,11 @@ variable thermo_step_M equal 100
 variable dump_step_M equal 500
 
 variable lx_0K_i equal 17.6516756136264
+<<<<<<< HEAD
 variable ly_0K_i equal "2*-25.856094925846836"
+=======
+variable ly_0K_i equal "2*25.856094925846836"
+>>>>>>> 001185a698d7edadf255829822c0e8ff61dbe8b4
 
 variable lx_0K_alloy equal "v_lx_0K_i*v_nx*v_SR_nx*v_S_nx"
 variable ly_0K_alloy equal "v_ly_0K_i*v_ny*v_SR_ny*v_S_ny"

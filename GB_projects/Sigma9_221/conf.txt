@@ -1,4 +1,0 @@
-init init.dat
-BR berendsen_relax_T500_steps200000.dat
-TR thermal_relax_T500_steps1000000.dat
-STR surface_thermal_relax_T500_steps1000000.dat

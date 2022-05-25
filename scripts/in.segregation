@@ -33,7 +33,6 @@ variable rnd_seed_S index 12345
 variable zlo_mobile_S equal 6.7
 variable md_steps equal 100
 variable mc_steps equal 10
-variable mu equal 1
 variable kappa equal 10
 variable S_nx equal 1 # replication
 variable S_ny equal 1 # replication
@@ -46,6 +45,8 @@ shell cat ../${gbpath}/input.txt
 print " "
 print "%%%%%%%%%%%%%%%%%%%%%%%%%"
 print " "
+variable mu0 index 1
+variable mu equal ${mu0}
 variable dt equal ${dt_S}
 variable potname index ${potname_alloy}
 if "${conc_f}!=-1" then "variable conc equal ${conc_f}"
