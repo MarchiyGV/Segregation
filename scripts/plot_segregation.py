@@ -77,8 +77,8 @@ def main(args):
         x1 = i*st
         res.append(slope(x1, w))
 
-    ax3.axhline(y=0.001, linestyle='--', color='gray')
-    ax3.axhline(y=-0.001, linestyle='--', color='gray')
+    ax3.axhline(y=args.slope_conv, linestyle='--', color='gray')
+    ax3.axhline(y=-args.slope_conv, linestyle='--', color='gray')
     ax1.set_xlabel('$step$')
     ax2.set_ylabel('$<E_{pot}>_{roll}, eV$')
     ax1.set_ylabel('$concentration$', color=color_red)
@@ -86,9 +86,9 @@ def main(args):
     ax3.set_ylabel('$\partial_t<E_{pot}>_{roll}, eV/step$')
     ax3.plot(res, 'o')
     ax1.set_xlim((0, len(t)))
-    ticks = list(ax1.get_xticks()) + [s1, len(t)]
+    ticks = list(ax1.get_xticks()) + [s1, len(pe1)+s1]
     ax1.set_xticks(ticks)
-    ax1.set_xticklabels(ticks, rotation='vertical')
+    ax1.set_xticklabels(list(map(int, ticks)), rotation='vertical')
     f.suptitle(args.name)
     f.tight_layout()
     ax2.text(0.99, 0.99, f'rolling mean over {n}', horizontalalignment='right', verticalalignment='top', transform=ax1.transAxes, zorder=10)
@@ -104,6 +104,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--name", required=True)
     parser.add_argument("-s", "--structure", required=True, dest='src')
+    parser.add_argument("--slope-conv", dest='slope_conv', default=0.001)
+    
     parser.add_argument("--w", type=int, default=3000, required=False, help='width of linear regression region for calculating slope')
     parser.add_argument("--st", type=int, default=100, required=False, help='step for points in which slope will be calculated')
     parser.add_argument("--num", type=int, default=500, required=False, help="width of rolling mean window")

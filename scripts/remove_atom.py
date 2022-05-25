@@ -1,4 +1,7 @@
     
+# problem with many opened files (PMIX error out of resource) https://github.com/openpmix/openpmix/issues/1513
+# closing avito instances https://www.ovito.org/forum/topic/how-to-remove-modifiers/#:~:text=you%20asked%20how%20to%20remove,element%20from%20a%20list%2C%20e.g.&text=deletes%20the%20first%20modifier%20from,to%20turn%20it%20off%2C%20e.g.
+
 def main(args):    
     from turtle import color
     import warnings
@@ -20,7 +23,7 @@ def main(args):
         os.chdir('scripts')
 
 
-    path = f"../GB_projects/{args.name}/slices/"
+    path = f"../GB_projects/{args.name}/samples_0K/"
     impath = f"../GB_projects/{args.name}/images/"
     Path(impath).mkdir(exist_ok=True)
     outpath = f"../GB_projects/{args.name}/output/"
@@ -85,6 +88,7 @@ def main(args):
         for id in ids:
             id = int(id)
             ind.append(list(data0.particles['Particle Identifier']).index(id))
+        ind = np.array(ind)
         x = np.array(data0.particles['Position'][:, 0])[ind]
         y = np.array(data0.particles['Position'][:, 1])[ind]
         xlen = data0.cell_[0,0]
@@ -98,7 +102,9 @@ def main(args):
     
     def do_stuff(i, id):
         global out
-        pipeline_i = import_file(file)
+        pipeline_i.source.load(file)
+        for mod in pipeline_i.modifiers:
+            mod.enabled = False
         selection = Selection(expression=f'ParticleIdentifier=={id}')
         pipeline_i.modifiers.append(selection)
 
@@ -128,11 +134,14 @@ def main(args):
         if args.postproc:            
             log =  os.popen(f'lmp_omp_edited -in in.mu '+
                             f'-var gbname {args.name} '+
-                            f'-var structure_name_1 slices/{args.src[0]} '+
+                            f'-var structure_name_1 samples_0K/{args.src[0]} '+
                             f'-var structure_name_2 tmp/{outname} '+
                             f'-var input {lmp_input} '+
                             f'-pk omp {args.omp_jobs} -sf omp').read()
+            exitflag = False
             for line in log.split('\n'):
+                if "All done" in line:
+                    exitflag = True
                 if '!' in line or args.debug:
                     print(line)
                     if 'mu' in line and '!' in line:
@@ -140,7 +149,10 @@ def main(args):
                         print(id, mu)
                         mus.append(mu)
                         out+=f'{id} {mu} {x[i]} {y[i]}\n'
+            if not exitflag:
+                raise ValueError('Error in LAMMPS!')
 
+    pipeline_i = import_file(file)
     for i, id in enumerate(ids):
         print(f'{i}/{len(ids)}: {round(100*i/len(ids))}%')
         do_stuff(i, id)

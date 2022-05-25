@@ -42,7 +42,7 @@ variable dump_step_TR equal 500
 variable surface_relax_steps equal 1000000
 variable dt_STR equal 0.001
 
-variable SR_nx equal 3 # replication
+variable SR_nx equal 1 # replication
 variable SR_ny equal 1 # replication
 variable SR_nz equal 3 # Replication #would be divided by 2 (cut)
 variable dz_surf equal -0.3
@@ -74,8 +74,8 @@ variable kappa equal 100
 variable thermo_step_M equal 100
 variable dump_step_M equal 500
 
-variable lx_0K_i equal 9.30324990958494
-variable ly_0K_i equal "2*29.13428346286567"
+variable lx_0K_i equal 17.6516756136264
+variable ly_0K_i equal "2*25.856094925846836"
 
 variable lx_0K_alloy equal "v_lx_0K_i*v_nx*v_SR_nx*v_S_nx"
 variable ly_0K_alloy equal "v_ly_0K_i*v_ny*v_SR_ny*v_S_ny"

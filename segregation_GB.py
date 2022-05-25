@@ -28,7 +28,7 @@ def main(args):
         if not flag:
             raise ValueError(f'cannot find structure in conf.txt')
     if args.mu:
-        mu_arg = f'-var mu0 {args.mu}'
+        mu_arg = f'-var mu0 {args.mu} '
     else:
         mu_arg = ''
 
@@ -114,6 +114,7 @@ def main(args):
                 plot_args.name = args.name
                 plot_args.src = src
                 plot_args.hide = (not args.plot)
+                plot_args.slope_conv = slope_conv
                 slope = np.array(plot(plot_args))
                 _N_conv_tot = np.sum(np.abs(slope)<=slope_conv)
                 if _N_conv_tot > N_conv_tot:
@@ -126,7 +127,7 @@ def main(args):
                 print('convergence criteria achieved in', N_conv, 'points')
 
                 if N_conv > N_conv_criteria:
-                    print(f'saving state for sampling: {file_count}')
+                    print(f'saving state for sampling: {file_count+1}')
                     file = datfile.replace("\n", "")
                     outfile = file.replace('.dat') + f'_n{file_count}.dat'
                     fpath = f'../GB_projects/{name}/dat/{file}'  
@@ -134,6 +135,9 @@ def main(args):
                     Path(dest).mkdir(exist_ok=True)  
                     shutil.copyfile(fpath, f'{dest}/{outfile}')
                     file_count+=1
+                    if file_count >= args.samples:
+                        p.kill()
+                        print('All done!')
                 
 
 
@@ -152,6 +156,7 @@ if __name__ == '__main__':
                         help='show the thermodynamic plot')
     parser.add_argument("--loops", required=False, default=100, type=int,
                         help='draw the thermodynamic plot each <N> loops')
+    parser.add_argument("--samples", required=False, default=100, type=int, help='how many samples to save')
     parser.add_argument("--ovito", required=False, default=False, action='store_true',
                         help='open the dump in ovito')
     args = parser.parse_args()
