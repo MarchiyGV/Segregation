@@ -5,7 +5,12 @@ from pathlib import Path
 import numpy as np
 import argparse, os
 import glob, re
-
+import scipy.stats
+def pretty_round(num):
+    working = str(num-int(num))
+    for i, e in enumerate(working[2:]):
+        if e != '0':
+            return int(num) + float(working[:i+3])
 
 def main(args):
     name = args.name
@@ -32,6 +37,10 @@ def main(args):
         for fpath in file:
             df = pd.read_csv(fpath, sep=' ', comment='#', names=['id', 'mu', 'x', 'y'])
             mu = np.array(df['mu'])
+            if args.lims:
+                mu = mu[mu>=np.min(args.lims)]
+                mu = mu[mu<=np.max(args.lims)]
+
             mu_avg += list(mu)
             if args.avg:
                 pass
@@ -42,10 +51,29 @@ def main(args):
             #ax.text(mu.max(), 10+j, round(mu.max(), 2), fontsize=7)
     
         if args.avg:
-            ax.hist(mu_avg, 250, density=True, label=f'$ c = {conc[-1]}$', alpha=0.7)
-    plt.xlim((np.min(mu_avg), np.max(mu_avg)))
+            if not args.cummulative:
+                ax.hist(mu_avg, args.nbins, density=True, label=('$ c_{Ni}'+f' = {conc[-1]}\%$'), alpha=0.5)
+                label = 'density'
+                title = 'histogramm'
+            else:
+                x = np.sort(mu_avg)
+                y = 1. * np.arange(len(mu_avg)) / (len(mu_avg) - 1)
+                mu_max = (np.max(x[y<=args.y])+np.min(x[y>=args.y]))/2
+                p = ax.plot(x, y, '.', label=('$ c_{Ni}'+f' = {conc[-1]}\%,'+' \mu_{int} = ' + f'{round(mu_max, 2)} eV$'))
+                label = 'probability'
+                title = 'distribution'
+                plt.plot(mu_max, args.y, '|', markersize=20, color=p[-1].get_color(), zorder=100)
+                
+    if args.lims:
+        plt.xlim(np.min(args.lims), np.max(args.lims))
+    if args.ylim:
+        plt.ylim(0, args.ylim)
+    if args.cummulative:
+        ax.hlines(args.y, ax.get_xlim()[0], ax.get_xlim()[1], linestyle='dashed', colors='k')
+    
     plt.xlabel('$\mu, eV$')
-    plt.ylabel('density')
+    plt.ylabel(label)
+    plt.title(title)
     plt.legend()
     plt.savefig(f'{impath}mu_distribution.png')
     plt.show()
@@ -55,6 +83,11 @@ if __name__ == '__main__':
     parser.add_argument("-n", "--name", required=True, help='for example STGB_210')
     parser.add_argument("-s", "--structure", required=True, dest='file', metavar='OUTPUT', nargs='+',
                         help='output of mu.py, for example "mu_minimize_0K_STGB_210_Ni_2_k_20.dat"')
-    parser.add_argument("--avg", required=False, help='plot average distribution', action='store_true', default=False)                  
+    parser.add_argument("--avg", required=False, help='plot average distribution', action='store_true', default=False)
+    parser.add_argument("--cummulative", required=False, help='plot cummulative distribution', action='store_true', default=False)        
+    parser.add_argument("--lims", required=False, default=False, nargs=2, type=float)
+    parser.add_argument("--ylim", required=False, default=False, type=float)
+    parser.add_argument("--nbins", required=False, default=250, type=int)
+    parser.add_argument("-y", required=False, default=0.9, type=float)
     args = parser.parse_args()
     main(args)

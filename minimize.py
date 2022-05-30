@@ -4,7 +4,7 @@ from subprocess import Popen, PIPE
 import time, re, shutil, sys, glob
 import numpy as np
 
-
+errors = []
 def main(args):
     lmp = 'lmp_omp_edited'
     nonverbose = (not args.verbose)
@@ -18,6 +18,11 @@ def main(args):
     structures = sorted(glob.glob(f'GB_projects/{name}/samples/{args.structure}'))
     for structure_ in structures:
         structure = structure_.split('/')[-1]
+        print(structure)
+        number = int(re.findall(r'\d+', structure)[-1])
+        if number<args.start:
+            print('already done, pass...')
+            continue
         print("Starting LAMMPS procedure...\n")
 
         print(os.getcwd())
@@ -58,13 +63,19 @@ def main(args):
                 os.popen(f'ovito {dumpfile}')
         else:
             print('\n!!!!!!!!!!!!!!!!!\n\nError occured in LAMMPS')
-            raise ValueError('Error in LAMMPS, check input script and log file')
+            #raise ValueError('Error in LAMMPS, check input script and log file')
+            errors.append(structure)
 
         file = datfile.replace("\n", "")
         fpath = f'../GB_projects/{name}/dat/{file}'  
         dest = f'../GB_projects/{name}/samples_0K'
         Path(dest).mkdir(exist_ok=True)  
         shutil.move(fpath, f'{dest}/{file}')
+    print('All done!')
+    if len(errors)>0:
+        print(len(errors))
+        for error in errors:
+            print('error in', error)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -74,6 +85,7 @@ if __name__ == '__main__':
                         help='show LAMMPS outpt')
     parser.add_argument("--pure", required=False, default=False, action='store_true')
     parser.add_argument("-j", "--job", required=False, default=1)
+    parser.add_argument("--start", required=False, default=0, type=int)
     parser.add_argument("--ovito", required=False, default=False, action='store_true',
                         help='open the dump in ovito')
     args = parser.parse_args()

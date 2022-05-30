@@ -69,6 +69,8 @@ args.norm = False
 print(args.file)
 mu_plot.main(args)
 '''
+print('Calculations done\nplotting...')
 args.file = flist
 args.avg = True
-mu_distribution.main(args)
+#mu_distribution.main(args)
+print('All done!')
