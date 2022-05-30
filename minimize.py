@@ -61,16 +61,17 @@ def main(args):
             print("LAMMPS finish succesfully")
             if args.ovito:
                 os.popen(f'ovito {dumpfile}')
+            file = datfile.replace("\n", "")
+            fpath = f'../GB_projects/{name}/dat/{file}'  
+            dest = f'../GB_projects/{name}/samples_0K'
+            Path(dest).mkdir(exist_ok=True)  
+            shutil.move(fpath, f'{dest}/{file}')
         else:
             print('\n!!!!!!!!!!!!!!!!!\n\nError occured in LAMMPS')
             #raise ValueError('Error in LAMMPS, check input script and log file')
             errors.append(structure)
 
-        file = datfile.replace("\n", "")
-        fpath = f'../GB_projects/{name}/dat/{file}'  
-        dest = f'../GB_projects/{name}/samples_0K'
-        Path(dest).mkdir(exist_ok=True)  
-        shutil.move(fpath, f'{dest}/{file}')
+        
     print('All done!')
     if len(errors)>0:
         print(len(errors))
