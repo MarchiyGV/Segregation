@@ -50,6 +50,7 @@ def main(args):
 
     print(task)
 
+    err_flag = False
     counter = 0
     N_conv = 0
     file_count = args.zero_count
@@ -70,6 +71,25 @@ def main(args):
             elif "vcsgc_loop" in line:
                 counter += 1
                 print('loop', counter)
+            elif "lx, ly, lz:" in line:
+                l = line.split(', ')
+                lx = float(l[-3].split()[-1])
+                ly = float(l[-2])
+                lz = float(l[-1])
+                l = np.array([lx, ly, lz])
+            elif "SGC - Interaction radius:" in line:
+                l_cut = float(line.split()[-1])
+                s = 'Simulation cell is too small for VCSGC:'
+                ax_labels = ['x', 'y', 'z']
+                for j, lj in enumerate(l):
+                    if lj/4 < l_cut:
+                        err_flag = True
+                        s += f'\n l_{ax_labels[j]} = {lj} < 4*cutoff = {l_cut*4}'
+                if err_flag:
+                    raise ValueError(s)
+            elif "Per-node simulation cell is too small for fix sgcmc" in line:
+                raise ValueError(line)
+
             if nonverbose:
                 if '!' in line:
                     print(line.replace('!', ''), end='')

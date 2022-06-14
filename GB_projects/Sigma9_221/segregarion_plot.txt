@@ -1,15 +1,6 @@
-<<<<<<< HEAD
-slope width 50000
-step 1000
-rolling mean width 1500
-offset 25
-converged slope 0.002
-number of points for convergence 10
-=======
 slope width 10
 step 1000
 rolling mean width 10
 offset 25
 converged slope 1000
 number of points for convergence 0
->>>>>>> 001185a698d7edadf255829822c0e8ff61dbe8b4

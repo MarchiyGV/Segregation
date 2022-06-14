@@ -3,7 +3,7 @@ clear
 
 units metal
 atom_style atomic
-boundary p p s
+boundary p p p
 
 variable gbname index STGB_210 #should be selected by user
 variable structure_name index thermal_relaxed_T500_steps100000.dat #should be selected by user
@@ -49,8 +49,10 @@ timestep ${dt}
 # ATOMS DEFINITION
 read_data ../${structure} 
 replicate ${SR_nx} ${SR_ny} ${SR_nz}
+
 region vac block EDGE EDGE EDGE EDGE $((zlo+zhi)/2+v_dz_surf) EDGE
 delete_atoms region vac compress yes
+change_box all boundary p p m
 region mobile block EDGE EDGE EDGE EDGE ${zlo_mobile_STR} EDGE
 group mobile region mobile
 ######################################

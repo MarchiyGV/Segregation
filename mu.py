@@ -1,7 +1,7 @@
 #/home/user/anaconda3/envs/ovito/bin/python
 import argparse, glob, re
 import scripts.remove_atom as remove_atom
-import mu_plot, mu_distribution
+#import mu_plot, mu_distribution
 import resource
 
 _n = 20
@@ -60,6 +60,7 @@ for i, structure_ in enumerate(structures):
         else:
             continue
     args.src = [fname, 'dat']
+    print('subroutine')
     remove_atom.main(args)
     
 

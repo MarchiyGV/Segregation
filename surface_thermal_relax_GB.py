@@ -15,7 +15,7 @@ def main(args):
         flag=False
         with open(fname, 'r') as f :
             for line in f:
-                if 'TR' in line:
+                if ('TR' in line) and (not 'STR' in line):
                     structure = line.split()[-1]
                     print(structure)
                     flag = True
@@ -38,6 +38,7 @@ def main(args):
             f'-sf omp')
 
     exitflag = False
+    print(task)
     with Popen(task.split(), stdout=PIPE, bufsize=1, universal_newlines=True) as p:
         time.sleep(0.1)
         print('\n')
