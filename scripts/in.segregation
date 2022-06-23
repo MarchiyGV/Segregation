@@ -90,14 +90,14 @@ variable conc_fix equal f_sgcmc[4]*100
 thermo_style custom step time temp pe v_conc_fix v_mu
 thermo ${thermo_step_S}
 shell mkdir ../${gbpath}/${thermo_output}
-variable file index ../${gbpath}/${thermo_output}/${self}_Ni_${conc}_k_${kappa}.txt
+variable file index ../${gbpath}/${thermo_output}/${self}_${element}_${conc}_k_${kappa}.txt
 print "thermo output file: ${file}"
 print "##dt = ${dt}" file ${file} screen no
 print "#time; temp; pe; conc" append ${file} screen no
 fix out all print ${thermo_step_S} "$(time); $(temp); $(pe); $(f_sgcmc[3])" append ${file} screen no
-dump 1 all cfg ${dump_step_S} ../${dump_path}/dump_Ni_${conc}_k_${kappa}_*.cfg mass type xs ys zs c_peratom
-dump_modify 1 element Ag Ni
-print "dumpfile ../${dump_path}/dump_Ni_${conc}_k_${kappa}_0.cfg"
+dump 1 all cfg ${dump_step_S} ../${dump_path}/dump_${element}_${conc}_k_${kappa}_*.cfg mass type xs ys zs c_peratom
+dump_modify 1 element Ag ${element}
+print "dumpfile ../${dump_path}/dump_${element}_${conc}_k_${kappa}_0.cfg"
 fix avg_conc all ave/time ${md_steps} ${mc_steps} $(v_md_steps*v_mc_steps) v_conc_fix file  ../${gbpath}/${thermo_output}/conc_avg.txt
 
 ######################################
@@ -124,7 +124,7 @@ unfix sgcmc
 fix sgcmc all sgcmc ${md_steps} 1 ${T} ${mu} variance ${kappa} $(v_conc/100)
 
 shell cd ../${gbpath}/${dat}
-write_data ${self}_Ni_${conc}_k_${kappa}.dat
-print "datfile ${self}_Ni_${conc}_k_${kappa}.dat"
+write_data ${self}_${element}_${conc}_k_${kappa}.dat
+print "datfile ${self}_${element}_${conc}_k_${kappa}.dat"
 shell cd ../../../${home} 
 jump SELF main_loop

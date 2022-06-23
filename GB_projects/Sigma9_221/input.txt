@@ -8,6 +8,7 @@
 
 ### --- common stats --- ###
 
+variable element index Cu
 variable potname_pure index GB_potential_Ag.txt
 variable potname_alloy index GB_potential_AgNi.txt
 variable mindist equal 20
