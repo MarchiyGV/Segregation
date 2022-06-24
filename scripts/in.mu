@@ -54,7 +54,7 @@ shell cd ../${home}
 
 dump 1 all cfg ${dump_step_M} ../${dump_path}/dump_*.cfg mass type xs ys zs
 if "${type} == pure" then "dump_modify 1 element Ag"
-if "${type} == alloy" then "dump_modify 1 element Ag Ni"
+if "${type} == alloy" then "dump_modify 1 element Ag ${element}"
 
 
 # ---------- Run Minimization --------------------- 
