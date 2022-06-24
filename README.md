@@ -19,7 +19,7 @@ User accessed scipts are placed in root folder, when files in script folder are 
 There are several steps of modelling implemented in scripts:
 
 - <strong>create_GB.py</strong> - creating sequence of smallest polycrystall supercells "GB_projects/S3_210/0K_structures/GB_E659_N80_count1.dat", where E659 - means that GB energy is 659kJ/mole, N80 - structure consist of 80 atoms, count1 - id of structure.
-User should choose optimal one from it (with minimum energy, but without defects). Chosen structure should be moved to "GB_projects/S3_210/dat" folder (it may be done automatically
+User should choose optimal one from it (with minimum energy, but without defects). Chosen structure should be moved to "GB_projects/S3_210/dat" folder (it may be done automatically. Code adapted from Mark Tschopp et al. (https://materialsdata.nist.gov/handle/11256/358)
 with renaming to "initial.dat"). For convinience name of this structure (e.g. "initial.dat") is writed to "GB_projects/S3_210/conf.txt" file in format "init initial.dat", 
 where "init" - name of step. It can be created manually or automatically. 
 - <strong>berendsen_relax.py</strong> replicate and relax structure (with barostat and thermostat) to target temperature and zero pressure. 
