@@ -43,6 +43,6 @@ All scripts can be run by command:
 
 All scripts provide help by "-h" option.
 
-##License
+## License
 
 This project is licensed under the terms of the MIT license.
