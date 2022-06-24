@@ -46,15 +46,14 @@ read_data ../${structure_1}
 # DEFINE INTERATOMIC POTENTIAL
 
 shell cd ../${pot_path}
-include ${potname}
+include ${potname_alloy}
 shell cd ../${home}
 
 ######################################
 # DEFINE THERMO AND OUTPUT
 
 dump 1 all cfg ${dump_step_M} ../${dump_path}/dump_*.cfg mass type xs ys zs
-if "${type} == pure" then "dump_modify 1 element Ag"
-if "${type} == alloy" then "dump_modify 1 element Ag ${element}"
+dump_modify 1 element Ag ${element}
 
 
 # ---------- Run Minimization --------------------- 
