@@ -55,10 +55,13 @@ def main(args):
     N_conv_tot = 0
     last_counter = 0
     datfile = ''
+    exitflag = False
     with Popen(task.split(), stdout=PIPE, bufsize=1, universal_newlines=True) as p:
         time.sleep(0.1)
         print('\n')
         for line in p.stdout:
+            if 'ERROR' in line:
+                raise ValueError(f'ERROR in LAMMPS: {line}')
             if 'thermo output file:' in line:
                 src_path = line.split()[-1]
                 src = src_path.split('/')[-1]
@@ -158,9 +161,12 @@ def main(args):
                         shutil.copyfile(fpath, f'{dest}/{outfile}')
                         file_count+=1
                         if file_count >= args.samples:
+                            exitflag = True
                             p.kill()
                             print('All done!')
-                
+    if not exitflag:
+        print('\n!!!!!!!!!!!!!!!!!\n\nError occured in LAMMPS')
+        raise ValueError('Error in LAMMPS, check input script and log file')
 
 
 if __name__ == '__main__':
