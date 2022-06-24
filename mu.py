@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-n", "--name", required=True)
 parser.add_argument("-s", "--structure", required=True,  metavar='STRUCTURE', 
                     help='structure from removing atom')
-parser.add_argument("-pp", "--post-proc", default='mu', dest='postproc', 
+parser.add_argument("-pp", "--post-proc", default='input', dest='postproc', 
                     metavar='ROUTINE_INPUT', help='evaluate mu with input ROUTINE_INPUT')
 parser.add_argument("-d", "--debug", required=False, default=False, action='store_true', help='plot clustering')
 parser.add_argument("-j", "--omp-jobs", required=False, dest='omp_jobs', default=4)
