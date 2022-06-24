@@ -36,12 +36,13 @@ Results are saving to "GB_projects/S3_210/output" (in format of text files with 
 - <strong>mu_plot.py</strong> plot map of surface chemical potential.
 - <strong>mu_distribution.py</strong> plot density of cumulative (CDF) distribution function of chamical potential
 
-
-This project is licensed under the terms of the MIT license.
-
 ### Syntax
 
 All scripts can be run by command:
 "python script_name.py -n S3_210 [other args]", where -n specify project directory.
 
 All scripts provide help by "-h" option.
+
+
+
+This project is licensed under the terms of the MIT license.
