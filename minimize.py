@@ -14,7 +14,56 @@ def main(args):
         script = 'in.minimize_0K_alloy'
     else:
         script = 'in.minimize_0K_pure'
-    
+
+    if not args.force_size:
+        fname = f'GB_projects/{name}/conf.txt'
+        flag=False
+        with open(fname, 'r') as f :
+            for line in f:
+                if 'init' in line:
+                    init = line.split()[-1]
+                    print(init)
+                    flag = True
+        if not flag:
+            raise ValueError(f'cannot find init structure in conf.txt in order to use 0K size, lease write it manually in input script and use --fore-size flag' )
+        flag_x = False
+        flag_y = False
+        with open(f'GB_projects/{name}/dat/{init}', 'r') as f:
+            for line in f:
+                if 'xlo xhi' in line:
+                    _args = line.split()
+                    xlo = float(_args[0])
+                    xhi = float(_args[1])
+                    dx = xhi - xlo
+                    flag_x = True
+                if 'ylo yhi' in line:
+                    _args = line.split()
+                    ylo = float(_args[0])
+                    yhi = float(_args[1])
+                    dy = yhi - ylo
+                    flag_y = True
+        if flag_x and flag_y:
+            lst = []
+            with open(f'GB_projects/{name}/input.txt' ,'r') as f:
+                a = ['lx_0K_i ', 'ly_0K_i ']
+                for line in f:
+                    for word in a:
+                        if word in line:
+                            _args = line.split()
+                            if 'lx_0K_i' in _args[1]:
+                                dksi = dx
+                            else:
+                                dksi = dy
+
+                            line = f'{_args[0]} {_args[1]} {_args[2]} {dksi}\n'
+                    lst.append(line)
+            with open(f'GB_projects/{name}/input.txt','w') as f:
+                for line in lst:
+                    f.write(line)
+        else:
+            raise ValueError('cannot read init structure file (xlo xhi, ylo yhi)')
+            
+
     structures = sorted(glob.glob(f'GB_projects/{name}/samples/{args.structure}'))
     for structure_ in structures:
         structure = structure_.split('/')[-1]
@@ -89,6 +138,8 @@ if __name__ == '__main__':
     parser.add_argument("--start", required=False, default=0, type=int)
     parser.add_argument("--ovito", required=False, default=False, action='store_true',
                         help='open the dump in ovito')
+    parser.add_argument("--force-size", dest='force_size', required=False, default=False, action='store_true',
+                        help='do not rewrite 0K size in input file')
     args = parser.parse_args()
     main(args)
 
