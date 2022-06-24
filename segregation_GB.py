@@ -3,13 +3,11 @@ import argparse, os
 from subprocess import Popen, PIPE
 import time, re, shutil, sys
 import numpy as np
-
-sys.path.insert(1, './scripts')
-
+sys.path.insert(1, f'{sys.path[0]}/scripts')
+from set_lammps import lmp
 from plot_segregation import main as plot
 
 def main(args):
-    lmp = 'lmp_omp_edited'
     nonverbose = (not args.verbose)
     job = args.job
     name = args.name

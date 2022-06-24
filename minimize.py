@@ -1,12 +1,13 @@
 from pathlib import Path
-import argparse, os
+import argparse, os, sys
 from subprocess import Popen, PIPE
 import time, re, shutil, sys, glob
 import numpy as np
+sys.path.insert(1, f'{sys.path[0]}/scripts')
+from set_lammps import lmp
 
 errors = []
 def main(args):
-    lmp = 'lmp_omp_edited'
     nonverbose = (not args.verbose)
     job = args.job
     name = args.name

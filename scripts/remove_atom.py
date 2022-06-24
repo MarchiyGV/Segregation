@@ -18,6 +18,7 @@ def main(args):
     import numpy as np
     from sklearn.cluster import DBSCAN
     from pathlib import Path
+    from set_lammps import lmp
    
     lmp_input = args.postproc
     if not (os.path.abspath(os.getcwd()).split('/'))[-1]=='scripts':
@@ -133,7 +134,7 @@ def main(args):
             #export_file(pipeline_i, f"{tmppath}{outname}", outtype, columns = properties)
         
         if args.postproc:            
-            log =  os.popen(f'lmp_omp_edited -in in.mu '+
+            log =  os.popen(f'{lmp} -in in.mu '+
                             f'-var gbname {args.name} '+
                             f'-var structure_name_1 samples_0K/{args.src[0]} '+
                             f'-var structure_name_2 tmp/{outname} '+
