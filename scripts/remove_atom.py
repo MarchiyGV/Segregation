@@ -2,8 +2,7 @@
 # problem with many opened files (PMIX error out of resource) https://github.com/openpmix/openpmix/issues/1513
 # closing avito instances https://www.ovito.org/forum/topic/how-to-remove-modifiers/#:~:text=you%20asked%20how%20to%20remove,element%20from%20a%20list%2C%20e.g.&text=deletes%20the%20first%20modifier%20from,to%20turn%20it%20off%2C%20e.g.
 
-def main(args):
-    print('start')    
+def main(args):  
     from turtle import color
     import warnings
     warnings.filterwarnings('ignore', message='.*OVITO.*PyPI')
@@ -154,9 +153,7 @@ def main(args):
             if not exitflag:
                 raise ValueError('Error in LAMMPS!')
 
-    print('import')
     pipeline_i = import_file(file)
-    print('ok')
     for i, id in enumerate(ids):
         print(f'{i}/{len(ids)}: {round(100*i/len(ids))}%')
         do_stuff(i, id)
@@ -174,7 +171,6 @@ def main(args):
             ni_z.append((data0.particles['Position'][:, 2])[i])
             out+=f'#Ni {i} {ni_x[-1]} {ni_y[-1]} {ni_z[-1]}\n'
     
-    print(out)
     with open(f'{outpath}mu_{args.src[0]}', 'w') as f:
         f.write(out)
 
