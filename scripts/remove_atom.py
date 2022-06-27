@@ -15,7 +15,6 @@ def main(args):
     from matplotlib import pyplot as plt
     import os
     import numpy as np
-    from sklearn.cluster import DBSCAN
     from pathlib import Path
     from set_lammps import lmp
    
@@ -63,18 +62,19 @@ def main(args):
         selector = DBSCAN(eps=0.8, min_samples=10).fit(z.reshape(-1,1))
         clusters = selector.fit_predict(z.reshape(-1,1))
         n = clusters[(list(z)).index(z.max())]
-
+        z_mean = z.mean()
         if args.debug:
             y = 0.5
             plt.plot(z_0, [y]*len(z_0), 'x')
-            for i, c in enumerate(clusters):
-                if c==-1:
-                    col='black'
+            for zs in z:
+                if zs>z_mean:
+                    col = 'black'
                 else:
-                    col=(10*['red', 'blue', 'green', 'pink', 'yellow', 'orange'])[c]
-                plt.plot([z[i]], [y], 'x', color=col)
+                    col = 'red'
+                plt.plot([zs], [y], 'x', color=col)
+                plt.axvline(z_mean, linestyle='--', color='grey')
             plt.show()
-        ids = ids1[clusters==n]
+        ids = ids1[z>z_mean]
         print(ids)
         return ids
 
@@ -126,11 +126,11 @@ def main(args):
         properties=["Particle Identifier", "Particle Type", "Position.X", "Position.Y", "Position.Z"]
         if args.src[1]=='dat':
             outtype="lammps/data"
-            #export_file(pipeline_i, f"{tmppath}{outname}", outtype)
+            export_file(pipeline_i, f"{tmppath}{outname}", outtype)
         elif args.src[1]=='dump':
             outtype="lammps/dump"
             properties.append("c_eng")
-            #export_file(pipeline_i, f"{tmppath}{outname}", outtype, columns = properties)
+            export_file(pipeline_i, f"{tmppath}{outname}", outtype, columns = properties)
         
         if args.postproc:            
             log =  os.popen(f'{lmp} -in in.mu '+
