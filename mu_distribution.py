@@ -61,7 +61,7 @@ def main(args):
                 x = np.sort(mu_avg)
                 y = 1. * np.arange(len(mu_avg)) / (len(mu_avg) - 1)
                 mu_max = (np.max(x[y<=args.y])+np.min(x[y>=args.y]))/2
-                p = ax.plot(x, y, '.', label=('$ c_{Ni}'+f' = {conc[-1]}\%,'+' \mu_{int} = ' + f'{round(mu_max, 2)} eV$'))
+                p = ax.plot(x, y, '.', label=('$ c_{' + element[-1] +'}'+f' = {conc[-1]}\%,'+' \mu_{int} = ' + f'{round(mu_max, 2)} eV$'))
                 label = 'probability'
                 title = 'distribution'
                 plt.plot(mu_max, args.y, '|', markersize=20, color=p[-1].get_color(), zorder=100)
