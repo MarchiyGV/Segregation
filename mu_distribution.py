@@ -62,7 +62,7 @@ def main(args):
                 y = 1. * np.arange(len(mu_avg)) / (len(mu_avg) - 1)
                 mu_max = (np.max(x[y<=args.y])+np.min(x[y>=args.y]))/2
                 if args.mean:
-                    postfix = f'<\mu> \ {round(mu_avg.mean(), 2)} eV'
+                    postfix = f'<\mu> \ {round(np.mean(mu_avg), 2)} eV'
                 else:
                     postfix = ' \mu_{int} = ' + f'{round(mu_max, 2)} eV'
                 p = ax.plot(x, y, '.', label=('$ c_{' + element[-1] +'}'+f' = {conc[-1]}\%,' + postfix + '$'))
