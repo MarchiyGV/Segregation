@@ -16,6 +16,7 @@ def main(args):
     import os
     import numpy as np
     from pathlib import Path
+    sys.path.insert(1, f'{sys.path[0]}/scripts')
     from set_lammps import lmp
    
     lmp_input = args.postproc
