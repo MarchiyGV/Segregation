@@ -31,7 +31,7 @@ This script also plot graphics in real time for checking covergence. Plotting an
 After achiving of convergence this script sterts saving samples in "GB_projects/S3_210/samples" folder for subsequent calculation of chemical potential.
 - <strong>minimize.py</strong> relax sampled structures to 0K state. Structures to relax can be defined via "-s structure_name1_n*.dat structure_name2_n*.dat ..." option, 
 where "structure_name_n*.dat" should be in folder "GB_projects/S3_210/samples" ("*" - denotes any number). Resuls are saving to "GB_projects/S3_210/samples_0K".
-- <strong>mu.py</strong> calculate chemical potential $\mu$ of surface atoms from relaxed structures from "samples_0K" folder specified via "-s structure_name1_n*.dat structure_name2_n*.dat ...". 
+- <strong>mu.py</strong> calculate chemical potential of surface atoms from relaxed structures from "samples_0K" folder specified via "-s structure_name1_n*.dat structure_name2_n*.dat ...". 
 Results are saving to "GB_projects/S3_210/output" (in format of text files with .dat extention).
 - <strong>mu_plot.py</strong> plot map of surface chemical potential.
 - <strong>mu_distribution.py</strong> plot density of cumulative (CDF) distribution function of chamical potential
