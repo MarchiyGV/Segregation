@@ -69,7 +69,7 @@ def main(args):
                 p = ax.plot(x, y, '.', label=('$ c_{' + element[-1] +'}'+f' = {conc[-1]}\%,' + postfix + '$'))
                 label = 'probability'
                 title = 'distribution'
-                if not ars.mean:
+                if not args.mean:
                     plt.plot(mu_max, args.y, '|', markersize=20, color=p[-1].get_color(), zorder=100)
                 
     if args.lims:
