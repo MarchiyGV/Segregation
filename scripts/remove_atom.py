@@ -59,9 +59,6 @@ def main(args):
         ids1 = data_surf.particles['Particle Identifier'][ids0]
         z_0 = data_surf.particles['Position'][:, 2]
         z = data_surf.particles['Position'][ids0, 2]
-        selector = DBSCAN(eps=0.8, min_samples=10).fit(z.reshape(-1,1))
-        clusters = selector.fit_predict(z.reshape(-1,1))
-        n = clusters[(list(z)).index(z.max())]
         z_mean = z.mean()
         if args.debug:
             y = 0.5
