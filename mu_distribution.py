@@ -66,11 +66,11 @@ def main(args):
                 else:
                     mu_max = (np.max(x[y<=args.y])+np.min(x[y>=args.y]))/2
                     postfix = ' \mu_{int} = ' + f'{round(mu_max, 2)} eV'
-                    plt.plot(mu_max, args.y, '|', markersize=20, color=p[-1].get_color(), zorder=100)
                 p = ax.plot(x, y, '.', label=('$ c_{' + element[-1] +'}'+f' = {conc[-1]}\%,' + postfix + '$'))
                 label = 'probability'
                 title = 'distribution'
-                
+                if not ars.mean:
+                    plt.plot(mu_max, args.y, '|', markersize=20, color=p[-1].get_color(), zorder=100)
                 
     if args.lims:
         plt.xlim(np.min(args.lims), np.max(args.lims))
