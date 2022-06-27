@@ -60,21 +60,23 @@ def main(args):
             else:
                 x = np.sort(mu_avg)
                 y = 1. * np.arange(len(mu_avg)) / (len(mu_avg) - 1)
-                mu_max = (np.max(x[y<=args.y])+np.min(x[y>=args.y]))/2
+                
                 if args.mean:
                     postfix = f'<\mu> \ {round(np.mean(mu_avg), 2)} eV'
                 else:
+                    mu_max = (np.max(x[y<=args.y])+np.min(x[y>=args.y]))/2
                     postfix = ' \mu_{int} = ' + f'{round(mu_max, 2)} eV'
+                    plt.plot(mu_max, args.y, '|', markersize=20, color=p[-1].get_color(), zorder=100)
                 p = ax.plot(x, y, '.', label=('$ c_{' + element[-1] +'}'+f' = {conc[-1]}\%,' + postfix + '$'))
                 label = 'probability'
                 title = 'distribution'
-                plt.plot(mu_max, args.y, '|', markersize=20, color=p[-1].get_color(), zorder=100)
+                
                 
     if args.lims:
         plt.xlim(np.min(args.lims), np.max(args.lims))
     if args.ylim:
         plt.ylim(0, args.ylim)
-    if args.cumulative:
+    if args.cumulative and not args.mean:
         ax.hlines(args.y, ax.get_xlim()[0], ax.get_xlim()[1], linestyle='dashed', colors='k')
     
     plt.xlabel('$\mu, eV$')
