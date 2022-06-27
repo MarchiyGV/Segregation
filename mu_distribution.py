@@ -53,7 +53,7 @@ def main(args):
             #ax.text(mu.max(), 10+j, round(mu.max(), 2), fontsize=7)
     
         if args.avg:
-            if not args.cummulative:
+            if not args.cumulative:
                 ax.hist(mu_avg, args.nbins, density=True, label=('$ c_{' + element[-1] +'}'+f' = {conc[-1]}\%$'), alpha=0.5)
                 label = 'density'
                 title = 'histogramm'
@@ -74,7 +74,7 @@ def main(args):
         plt.xlim(np.min(args.lims), np.max(args.lims))
     if args.ylim:
         plt.ylim(0, args.ylim)
-    if args.cummulative:
+    if args.cumulative:
         ax.hlines(args.y, ax.get_xlim()[0], ax.get_xlim()[1], linestyle='dashed', colors='k')
     
     plt.xlabel('$\mu, eV$')
