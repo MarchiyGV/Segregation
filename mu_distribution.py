@@ -61,7 +61,11 @@ def main(args):
                 x = np.sort(mu_avg)
                 y = 1. * np.arange(len(mu_avg)) / (len(mu_avg) - 1)
                 mu_max = (np.max(x[y<=args.y])+np.min(x[y>=args.y]))/2
-                p = ax.plot(x, y, '.', label=('$ c_{' + element[-1] +'}'+f' = {conc[-1]}\%,'+' \mu_{int} = ' + f'{round(mu_max, 2)} eV$'))
+                if args.mean:
+                    postfix = f'<\mu> \ {round(mu_avg.mean(), 2)} eV'
+                else:
+                    postfix = ' \mu_{int} = ' + f'{round(mu_max, 2)} eV'
+                p = ax.plot(x, y, '.', label=('$ c_{' + element[-1] +'}'+f' = {conc[-1]}\%,' + postfix + '$'))
                 label = 'probability'
                 title = 'distribution'
                 plt.plot(mu_max, args.y, '|', markersize=20, color=p[-1].get_color(), zorder=100)
@@ -86,7 +90,8 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--structure", required=True, dest='file', metavar='OUTPUT', nargs='+',
                         help='output of mu.py, for example "mu_minimize_0K_STGB_210_Ni_2_k_20.dat"')
     parser.add_argument("--avg", required=False, help='plot average distribution', action='store_true', default=False)
-    parser.add_argument("--cummulative", required=False, help='plot cummulative distribution', action='store_true', default=False)        
+    parser.add_argument("--cumulative", required=False, help='plot cumulative distribution', action='store_true', default=False)   
+    parser.add_argument("--mean", required=False, help='calculate mean mu instead of mu_{y}', action='store_true', default=False)       
     parser.add_argument("--lims", required=False, default=False, nargs=2, type=float)
     parser.add_argument("--ylim", required=False, default=False, type=float)
     parser.add_argument("--nbins", required=False, default=250, type=int)
