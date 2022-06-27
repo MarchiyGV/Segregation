@@ -29,11 +29,13 @@ def main(args):
         files.append(glob.glob(f'GB_projects/{name}/output/{e}'))
     
     conc = []
+    element = []
 
     for j, file in enumerate(files):
         mu_avg = []
         fname = file[0].split('/')[-1]
         conc.append(float(re.findall(r'\d+\.*\d*', fname)[1]))
+        element.append(fname.split('_')[-5])
         for fpath in file:
             df = pd.read_csv(fpath, sep=' ', comment='#', names=['id', 'mu', 'x', 'y'])
             mu = np.array(df['mu'])
@@ -52,7 +54,7 @@ def main(args):
     
         if args.avg:
             if not args.cummulative:
-                ax.hist(mu_avg, args.nbins, density=True, label=('$ c_{Ni}'+f' = {conc[-1]}\%$'), alpha=0.5)
+                ax.hist(mu_avg, args.nbins, density=True, label=('$ c_{' + element[-1] +'}'+f' = {conc[-1]}\%$'), alpha=0.5)
                 label = 'density'
                 title = 'histogramm'
             else:
